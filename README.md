@@ -8,6 +8,15 @@ dotnet ef database update --project src/StockDataAggregator.Persistence --startu
 
 # Running the Application
 To run the application, use the following command:
+Backend:
 ```bash
+cd api
 dotnet run --project src/StockDataAggregator.Api
+```
+
+Frontend:
+```bash
+cd frontend
+npm install
+npm run dev
 ```
