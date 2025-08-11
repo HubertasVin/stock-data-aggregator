@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using StockDataAggregator.Application.Dtos;
-using StockDataAggregator.Application.Interfaces;
+using StockDataAggregator.Application.Services;
 
 namespace StockDataAggregator.Api.Controllers;
 
@@ -8,14 +8,14 @@ namespace StockDataAggregator.Api.Controllers;
 [Route("api/v1/balancedrisk")]
 public class BalancedRiskMetricsController : ControllerBase
 {
-    private readonly ISymbolMetricsRepository _repo;
+    private readonly BalancedRiskScoringService _svc;
 
-    public BalancedRiskMetricsController(ISymbolMetricsRepository repo) => _repo = repo;
+    public BalancedRiskMetricsController(BalancedRiskScoringService svc) => _svc = svc;
 
     [HttpGet("{symbol}")]
-    public async Task<ActionResult<BalancedRiskMetricsDto>> Get(string symbol)
+    public async Task<ActionResult<BalancedRiskAnalysisDto>> Get(string symbol)
     {
-        var dto = await _repo.GetBalancedRiskAsync(symbol);
+        var dto = await _svc.AnalyzeAsync(symbol);
         return dto is not null ? Ok(dto) : NotFound();
     }
 }

@@ -1,48 +1,71 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { fetchAllMetrics, type OkResult, type ErrResult } from './api'
-import StocksTable from './components/StocksTable.vue'
-import type { BalancedRiskMetrics } from './types'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter, RouterLink, RouterView } from 'vue-router'
+import { getAuthToken, isAuthenticated, setAuthToken } from './api'
+import AddSymbolModal from './components/AddSymbolModal.vue'
 
-const loading = ref(true)
-const error = ref('')
-const rows = ref<BalancedRiskMetrics[]>([])
+const router = useRouter()
+const theme = ref<'light' | 'dark'>('light')
+const authed = ref(isAuthenticated())
+const openAdd = ref(false)
 
-function isOk(r: OkResult | ErrResult): r is OkResult {
-  return r.ok === true
+function applyTheme(t: 'light' | 'dark') {
+  theme.value = t
+  document.documentElement.setAttribute('data-theme', t)
+  localStorage.setItem('theme', t)
 }
-function isErr(r: OkResult | ErrResult): r is ErrResult {
-  return r.ok === false
+function toggleTheme() { applyTheme(theme.value === 'light' ? 'dark' : 'light') }
+
+function onAuthChanged(e: Event) {
+  authed.value = !!getAuthToken()
+  // close any modal on auth boundary changes
+  openAdd.value = false
+}
+function logout() {
+  setAuthToken(null)
+  authed.value = false
+  window.dispatchEvent(new CustomEvent('auth-changed', { detail: { authed: false } }))
+  router.push('/login')
+}
+function onAdded() {
+  // let Home.vue know to refresh
+  window.dispatchEvent(new CustomEvent('symbol-added'))
+  openAdd.value = false
 }
 
-onMounted(async () => {
-  try {
-    const results = await fetchAllMetrics()
-
-    const oks = results.filter(isOk)
-    rows.value = oks.map(r => r.data)
-
-    const failed = results.filter(isErr)
-    if (failed.length) error.value = `Failed: ${failed.map(f => f.symbol).join(', ')}`
-  } catch (e) {
-    error.value = String(e)
-  } finally {
-    loading.value = false
-  }
+onMounted(() => {
+  document.title = 'HubertasVin stock data aggregator'
+  const saved = localStorage.getItem('theme') as 'light' | 'dark' | null
+  applyTheme(saved === 'dark' ? 'dark' : 'light')
+  authed.value = !!getAuthToken()
+  openAdd.value = false
+  window.addEventListener('auth-changed', onAuthChanged)
+})
+onUnmounted(() => {
+  window.removeEventListener('auth-changed', onAuthChanged)
 })
 </script>
 
 <template>
   <div class="container">
     <div class="header">
-      <div class="title">Stocks</div>
-      <div class="subtle">balanced risk metrics</div>
+      <div class="title"><span class="brand">HubertasVin</span> stock data aggregator</div>
+      <div class="header-actions">
+        <button class="toggle" @click="toggleTheme" aria-label="Switch theme">
+          <img v-if="theme === 'light'" src="/moon.svg" alt="" class="icon-20 icon-img" />
+          <img v-else src="/sun.svg" alt="" class="icon-20 icon-img" />
+        </button>
+
+        <RouterLink v-if="!authed" class="btn" to="/login">Login</RouterLink>
+        <button v-else class="btn" @click="logout">Logout</button>
+
+        <button v-if="authed" class="btn btn-primary" @click="openAdd = true">+ Add symbol</button>
+      </div>
     </div>
 
-    <div v-if="loading" class="status">Loading…</div>
-    <div v-else-if="error" class="status error">{{ error }}</div>
-    <StocksTable v-else :rows="rows" />
-
+    <RouterView />
     <footer>Powered by StockDataAggregator</footer>
+
+    <AddSymbolModal v-if="authed" v-model:open="openAdd" @added="onAdded" />
   </div>
 </template>

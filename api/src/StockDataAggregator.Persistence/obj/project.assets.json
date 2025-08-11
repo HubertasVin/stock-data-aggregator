@@ -268,6 +268,9 @@
       "StockDataAggregator.Application/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "Microsoft.Extensions.Options": "9.0.8"
+        },
         "compile": {
           "bin/placeholder/StockDataAggregator.Application.dll": {}
         },

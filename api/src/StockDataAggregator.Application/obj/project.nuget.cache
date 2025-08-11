@@ -1,8 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "S99MF3pnUCA=",
+  "dgSpecHash": "krakrvh36Vw=",
   "success": true,
   "projectFilePath": "/home/hubertas/Documents/backup-folder/Programming/CS/StockDataAggregator/api/src/StockDataAggregator.Application/StockDataAggregator.Application.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/home/hubertas/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/9.0.8/microsoft.extensions.dependencyinjection.abstractions.9.0.8.nupkg.sha512",
+    "/home/hubertas/.nuget/packages/microsoft.extensions.options/9.0.8/microsoft.extensions.options.9.0.8.nupkg.sha512",
+    "/home/hubertas/.nuget/packages/microsoft.extensions.primitives/9.0.8/microsoft.extensions.primitives.9.0.8.nupkg.sha512"
+  ],
   "logs": []
 }

@@ -5,7 +5,7 @@ namespace StockDataAggregator.Persistence.Mappers;
 
 public static class BalancedRiskMapper
 {
-    public static BalancedRiskMetricsDto ToBalancedRiskDto(this SymbolMetrics e) =>
+    public static BalancedRiskAnalysisDto ToBalancedRiskDto(this SymbolMetrics e) =>
         new()
         {
             Symbol = e.Symbol,

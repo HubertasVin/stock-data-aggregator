@@ -81,7 +81,6 @@ public sealed class FmpClient : IFmpClient
             var separator = relativePath.Contains('?') ? '&' : '?';
             var fullPath = $"{relativePath}{separator}apikey={_apiKey}";
             var json = await _http.GetStringAsync(fullPath);
-            // _log.LogDebug("Response for {Path}: {Json}", _http.BaseAddress + fullPath, json);
 
             if (string.IsNullOrWhiteSpace(json) || json == "[]")
             {

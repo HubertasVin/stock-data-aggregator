@@ -56,6 +56,9 @@
         }
       },
       "StockDataAggregator.Application/1.0.0": {
+        "dependencies": {
+          "Microsoft.Extensions.Options": "9.0.8"
+        },
         "runtime": {
           "StockDataAggregator.Application.dll": {
             "assemblyVersion": "1.0.0",

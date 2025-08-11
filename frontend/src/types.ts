@@ -1,7 +1,13 @@
+export interface MetricBounds {
+  lower?: number | null;
+  upper?: number | null;
+}
+
 export interface BalancedRiskMetrics {
   symbol: string;
   date: string;
   updateDate: string;
+
   oneYearSalesGrowth: number;
   fiveYearSalesGrowth: number;
   fiveYearEarningsGrowth: number;
@@ -9,8 +15,14 @@ export interface BalancedRiskMetrics {
   debtToEquity: number;
   pegRatio: number;
   returnOnEquity: number;
-  esgTotal?: number;
-  esgEnvironment?: number;
-  esgSocial?: number;
-  esgGovernance?: number;
+
+  oneYearSalesGrowthBounds?: MetricBounds | null;
+  fiveYearSalesGrowthBounds?: MetricBounds | null;
+  fiveYearEarningsGrowthBounds?: MetricBounds | null;
+  freeCashFlowBounds?: MetricBounds | null;
+  debtToEquityBounds?: MetricBounds | null;
+  pegRatioBounds?: MetricBounds | null;
+  returnOnEquityBounds?: MetricBounds | null;
+
+  score?: number | null;
 }

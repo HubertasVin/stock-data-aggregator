@@ -437,3 +437,5 @@
 /home/hubertas/Documents/backup-folder/Programming/CS/StockDataAggregator/api/src/StockDataAggregator.Api/obj/Debug/net9.0/StockDataAggregator.Api.pdb
 /home/hubertas/Documents/backup-folder/Programming/CS/StockDataAggregator/api/src/StockDataAggregator.Api/obj/Debug/net9.0/StockDataAggregator.Api.genruntimeconfig.cache
 /home/hubertas/Documents/backup-folder/Programming/CS/StockDataAggregator/api/src/StockDataAggregator.Api/obj/Debug/net9.0/ref/StockDataAggregator.Api.dll
+/home/hubertas/Documents/backup-folder/Programming/CS/StockDataAggregator/api/src/StockDataAggregator.Api/bin/Debug/net9.0/Microsoft.Extensions.Configuration.Binder.dll
+/home/hubertas/Documents/backup-folder/Programming/CS/StockDataAggregator/api/src/StockDataAggregator.Api/bin/Debug/net9.0/Microsoft.Extensions.Options.ConfigurationExtensions.dll

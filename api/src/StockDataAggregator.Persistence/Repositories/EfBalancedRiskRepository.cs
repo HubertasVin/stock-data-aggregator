@@ -91,7 +91,39 @@ public class EfSymbolMetricsRepository : ISymbolMetricsRepository
             };
     }
 
-    public async Task<BalancedRiskMetricsDto?> GetBalancedRiskAsync(string symbol)
+    public async Task<IReadOnlyList<SymbolMetricsDto>> GetAllLatestPerSymbolAsync()
+    {
+        var latestDates = _db
+            .SymbolMetrics.AsNoTracking()
+            .GroupBy(x => x.Symbol)
+            .Select(g => new { Symbol = g.Key, Date = g.Max(x => x.Date) });
+
+        var query =
+            from e in _db.SymbolMetrics.AsNoTracking()
+            join ld in latestDates on new { e.Symbol, e.Date } equals new { ld.Symbol, ld.Date }
+            select new SymbolMetricsDto
+            {
+                Symbol = e.Symbol,
+                Date = e.Date,
+                UpdateDate = e.UpdateDate,
+                OneYearSalesGrowth = e.OneYearSalesGrowth,
+                FiveYearSalesGrowth = e.FiveYearSalesGrowth,
+                FiveYearEarningsGrowth = e.FiveYearEarningsGrowth,
+                FreeCashFlow = e.FreeCashFlow,
+                DebtToEquity = e.DebtToEquity,
+                PegRatio = e.PegRatio,
+                ReturnOnEquity = e.ReturnOnEquity,
+                EsgTotal = e.EsgTotal,
+                EsgEnvironment = e.EsgEnvironment,
+                EsgSocial = e.EsgSocial,
+                EsgGovernance = e.EsgGovernance,
+                EsgPublicationDate = e.EsgPublicationDate,
+            };
+
+        return await query.ToListAsync();
+    }
+
+    public async Task<BalancedRiskAnalysisDto?> GetBalancedRiskAsync(string symbol)
     {
         var e = await _db
             .SymbolMetrics.Where(x => x.Symbol == symbol)

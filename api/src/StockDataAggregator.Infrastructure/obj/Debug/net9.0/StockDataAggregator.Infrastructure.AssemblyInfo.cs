@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("StockDataAggregator.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+26d567bcb71329a647ecc2df3e7e2584150fb0b1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4993ed23e4bfd69b6f920abb2cc11e61b8590bac")]
 [assembly: System.Reflection.AssemblyProductAttribute("StockDataAggregator.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("StockDataAggregator.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

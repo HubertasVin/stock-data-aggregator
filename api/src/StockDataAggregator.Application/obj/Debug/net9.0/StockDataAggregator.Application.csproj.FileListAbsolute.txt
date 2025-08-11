@@ -32,3 +32,4 @@
 /home/hubertas/Documents/backup-folder/Programming/CS/StockDataAggregator/api/src/StockDataAggregator.Application/obj/Debug/net9.0/refint/StockDataAggregator.Application.dll
 /home/hubertas/Documents/backup-folder/Programming/CS/StockDataAggregator/api/src/StockDataAggregator.Application/obj/Debug/net9.0/StockDataAggregator.Application.pdb
 /home/hubertas/Documents/backup-folder/Programming/CS/StockDataAggregator/api/src/StockDataAggregator.Application/obj/Debug/net9.0/ref/StockDataAggregator.Application.dll
+/home/hubertas/Documents/backup-folder/Programming/CS/StockDataAggregator/api/src/StockDataAggregator.Application/obj/Debug/net9.0/StockDataAggregator.Application.csproj.AssemblyReference.cache
