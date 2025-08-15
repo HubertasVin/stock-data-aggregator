@@ -32,39 +32,38 @@ public sealed class BalancedRiskScoringService
 
         var b = _bounds.CurrentValue;
 
-        if (universe.Count < 5)
-            return BuildDto(latest, 5, b);
+        var valsFCF = universe.Select(v => v.FreeCashFlow).OrderBy(v => v).ToList();
+        var fcfMedian =
+            valsFCF.Count == 0
+                ? 0m
+                : (valsFCF[valsFCF.Count / 2] + valsFCF[(valsFCF.Count - 1) / 2]) / 2m;
 
-        var vals1y = universe.Select(v => v.OneYearSalesGrowth).ToList();
-        var vals5yS = universe.Select(v => v.FiveYearSalesGrowth).ToList();
-        var vals5yE = universe.Select(v => v.FiveYearEarningsGrowth).ToList();
-        var valsFCF = universe.Select(v => v.FreeCashFlow).ToList();
-        var valsDE = universe.Select(v => CleanDebtToEquity(v.DebtToEquity)).ToList();
-        var valsPEG = universe.Select(v => CleanPeg(v.PegRatio)).ToList();
-        var valsROE = universe.Select(v => v.ReturnOnEquity).ToList();
+        double s1y = ScoreHigher(
+            latest.OneYearSalesGrowth,
+            b.OneYearSalesGrowth,
+            fallbackHiFactor: 2.0
+        );
+        double s5yS = ScoreHigher(
+            latest.FiveYearSalesGrowth,
+            b.FiveYearSalesGrowth,
+            fallbackHiFactor: 1.5
+        );
+        double s5yE = ScoreHigher(
+            latest.FiveYearEarningsGrowth,
+            b.FiveYearEarningsGrowth,
+            fallbackHiFactor: 1.5
+        );
 
-        double S(
-            decimal value,
-            List<decimal> vec,
-            bool higherIsBetter,
-            BalancedRiskBoundsOptions.MetricBounds mb
-        )
-        {
-            var p = Percentile(vec, value, higherIsBetter);
-            var inBounds = InBounds(value, mb);
-            var s = p * (inBounds ? 1.0 : 0.6);
-            if (double.IsNaN(s) || double.IsInfinity(s))
-                s = 0.5;
-            return Math.Clamp(s, 0.02, 0.98);
-        }
+        double sFCF = ScoreFcf(latest.FreeCashFlow, b.FreeCashFlow, fcfMedian);
 
-        double s1y = S(latest.OneYearSalesGrowth, vals1y, true, b.OneYearSalesGrowth);
-        double s5yS = S(latest.FiveYearSalesGrowth, vals5yS, true, b.FiveYearSalesGrowth);
-        double s5yE = S(latest.FiveYearEarningsGrowth, vals5yE, true, b.FiveYearEarningsGrowth);
-        double sFCF = S(latest.FreeCashFlow, valsFCF, true, b.FreeCashFlow);
-        double sDE = S(CleanDebtToEquity(latest.DebtToEquity), valsDE, false, b.DebtToEquity);
-        double sPEG = S(CleanPeg(latest.PegRatio), valsPEG, false, b.PegRatio);
-        double sROE = S(latest.ReturnOnEquity, valsROE, true, b.ReturnOnEquity);
+        double sDE = ScoreLower(
+            CleanDebtToEquity(latest.DebtToEquity),
+            b.DebtToEquity,
+            idealLow: 0m
+        );
+        double sPEG = ScoreLower(CleanPeg(latest.PegRatio), b.PegRatio, idealLow: 0m);
+
+        double sROE = ScoreHigher(latest.ReturnOnEquity, b.ReturnOnEquity, fallbackHiFactor: 2.0);
 
         const double W_1Y = 0.15;
         const double W_5YS = 0.10;
@@ -74,74 +73,119 @@ public sealed class BalancedRiskScoringService
         const double W_DE = 0.05;
         const double W_PEG = 0.30;
 
-        double CompositeFor(
-            decimal oneY,
-            decimal fiveYS,
-            decimal fiveYE,
-            decimal fcf,
-            decimal de,
-            decimal peg,
-            decimal roe
-        )
-        {
-            var c1y = S(oneY, vals1y, true, b.OneYearSalesGrowth);
-            var c5s = S(fiveYS, vals5yS, true, b.FiveYearSalesGrowth);
-            var c5e = S(fiveYE, vals5yE, true, b.FiveYearEarningsGrowth);
-            var cfcf = S(fcf, valsFCF, true, b.FreeCashFlow);
-            var cde = S(CleanDebtToEquity(de), valsDE, false, b.DebtToEquity);
-            var cpeg = S(CleanPeg(peg), valsPEG, false, b.PegRatio);
-            var croe = S(roe, valsROE, true, b.ReturnOnEquity);
+        double composite =
+            W_PEG * sPEG
+            + W_ROE * sROE
+            + W_5YE * s5yE
+            + W_5YS * s5yS
+            + W_1Y * s1y
+            + W_DE * sDE
+            + W_FCF * sFCF;
 
-            return W_PEG * cpeg
-                + W_ROE * croe
-                + W_5YE * c5e
-                + W_5YS * c5s
-                + W_1Y * c1y
-                + W_DE * cde
-                + W_FCF * cfcf;
-        }
-
-        var composites = universe
-            .Select(u =>
-                CompositeFor(
-                    u.OneYearSalesGrowth,
-                    u.FiveYearSalesGrowth,
-                    u.FiveYearEarningsGrowth,
-                    u.FreeCashFlow,
-                    u.DebtToEquity,
-                    u.PegRatio,
-                    u.ReturnOnEquity
-                )
-            )
-            .ToList();
-
-        var myComposite = CompositeFor(
-            latest.OneYearSalesGrowth,
-            latest.FiveYearSalesGrowth,
-            latest.FiveYearEarningsGrowth,
-            latest.FreeCashFlow,
-            latest.DebtToEquity,
-            latest.PegRatio,
-            latest.ReturnOnEquity
-        );
-
-        var pComp = Percentile(
-            composites.Select(x => (decimal)x).ToList(),
-            (decimal)myComposite,
-            true
-        );
-        var score = Math.Clamp((int)Math.Ceiling(pComp * 10.0), 1, 10);
+        double raw = Math.Clamp(composite, 0.0, 1.0);
+        int score = (int)Math.Clamp(Math.Round(1 + 9 * raw, MidpointRounding.AwayFromZero), 1, 10);
 
         return BuildDto(latest, score, b);
+    }
+
+    // Higher is better. If both bounds exist, linear between [lower..upper].
+    // If only lower exists, we linearly ramp from lower to (lower * fallbackHiFactor).
+    private static double ScoreHigher(
+        decimal value,
+        BalancedRiskBoundsOptions.MetricBounds mb,
+        double fallbackHiFactor
+    )
+    {
+        var lo = mb.Lower;
+        var up = mb.Upper;
+
+        if (lo is null && up is null)
+            return value <= 0 ? 0.0 : 1.0;
+
+        if (up is not null && lo is not null && up > lo)
+            return Linear((double)(value - lo.Value), 0.0, (double)(up.Value - lo.Value));
+
+        if (lo is not null)
+        {
+            var hi = lo.Value * (decimal)fallbackHiFactor;
+            if (hi <= lo.Value)
+                hi = lo.Value + (decimal)0.10;
+            return Linear((double)(value - lo.Value), 0.0, (double)(hi - lo.Value));
+        }
+
+        if (up is not null)
+            return Linear((double)(up.Value - value), 0.0, (double)up.Value);
+
+        return 0.5;
+    }
+
+    // Lower is better. If both bounds exist, linear between [lower..upper] inverted.
+    // If only upper exists, map [0..upper] → [1..0].
+    private static double ScoreLower(
+        decimal value,
+        BalancedRiskBoundsOptions.MetricBounds mb,
+        decimal idealLow
+    )
+    {
+        var lo = mb.Lower ?? idealLow;
+        var up = mb.Upper;
+
+        if (up is not null && up > lo)
+            return Linear((double)(up.Value - (decimal)value), 0.0, (double)(up.Value - lo));
+
+        if (up is not null)
+            return Linear((double)(up.Value - (decimal)value), 0.0, (double)up.Value);
+
+        return Linear((double)(lo - (decimal)value), 0.0, (double)lo);
+    }
+
+    private static double ScoreFcf(
+        decimal value,
+        BalancedRiskBoundsOptions.MetricBounds mb,
+        decimal median
+    )
+    {
+        if (value <= 0)
+            return 0.0;
+        var scale = Math.Max(1m, median * 2m);
+        var s = Math.Log(1.0 + (double)value) / Math.Log(1.0 + (double)scale);
+        return Math.Clamp(s, 0.0, 1.0);
+    }
+
+    // piecewise linear helper: map (x in [0..range]) to [0..1], clamp.
+    private static double Linear(double x, double min, double range)
+    {
+        if (range <= 0.0)
+            return 0.5;
+        var t = (x - min) / range;
+        return Math.Clamp(t, 0.0, 1.0);
+    }
+
+    // Negative PEG is usually undefined (negative earnings). Treat as mediocre rather than catastrophically bad
+    private static decimal CleanPeg(decimal x)
+    {
+        if (x <= 0)
+            return 3.0m;
+        if (x > 1000m)
+            return 1000m;
+        return x;
+    }
+
+    private static decimal CleanDebtToEquity(decimal x)
+    {
+        if (x < 0)
+            return 0m;
+        if (x > 1000m)
+            return 1000m;
+        return x;
     }
 
     private static BalancedRiskAnalysisDto BuildDto(
         SymbolMetricsDto e,
         int score,
         BalancedRiskBoundsOptions b
-    )
-    {
-        return new BalancedRiskAnalysisDto
+    ) =>
+        new()
         {
             Symbol = e.Symbol,
             Date = e.Date,
@@ -192,53 +236,4 @@ public sealed class BalancedRiskScoringService
 
             Score = score,
         };
-    }
-
-    private static bool InBounds(decimal v, BalancedRiskBoundsOptions.MetricBounds b)
-    {
-        if (b.Lower is decimal lo && !(v > lo))
-            return false;
-        if (b.Upper is decimal up && !(v < up))
-            return false;
-        return true;
-    }
-
-    private static decimal CleanPeg(decimal x)
-    {
-        if (x <= 0)
-            return 10m;
-        if (x > 1000m)
-            return 1000m;
-        return x;
-    }
-
-    private static decimal CleanDebtToEquity(decimal x)
-    {
-        if (x < 0)
-            return 0m;
-        if (x > 1000m)
-            return 1000m;
-        return x;
-    }
-
-    private static double Percentile(List<decimal> values, decimal target, bool higherIsBetter)
-    {
-        if (values.Count == 0)
-            return 0.0;
-        int less = 0,
-            equal = 0;
-        foreach (var v in values)
-        {
-            if (v < target)
-                less++;
-            else if (v == target)
-                equal++;
-        }
-        double p = (less + 0.5 * equal) / values.Count;
-        if (!higherIsBetter)
-            p = 1.0 - p;
-        if (double.IsNaN(p) || double.IsInfinity(p))
-            return 0.0;
-        return Math.Clamp(p, 0.0, 1.0);
-    }
 }

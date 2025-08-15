@@ -1,1 +1,9 @@
 deploy/api.env
+api/src/StockDataAggregator.Api/obj
+api/src/StockDataAggregator.Api/bin
+api/src/StockDataAggregator.Application/obj
+api/src/StockDataAggregator.Application/bin
+api/src/StockDataAggregator.Infrastructure/obj
+api/src/StockDataAggregator.Infrastructure/bin
+api/src/StockDataAggregator.Persistence/obj
+api/src/StockDataAggregator.Persistence/bin
