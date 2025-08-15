@@ -45,8 +45,8 @@ const firstBounds = computed(() => {
     if (!r) return null
     return {
         oneYearSalesGrowth: r.oneYearSalesGrowthBounds ?? null,
-        fiveYearSalesGrowth: r.fiveYearSalesGrowthBounds ?? null,
-        fiveYearEarningsGrowth: r.fiveYearEarningsGrowthBounds ?? null,
+        fourYearSalesGrowth: r.fourYearSalesGrowthBounds ?? null,
+        fourYearEarningsGrowth: r.fourYearEarningsGrowthBounds ?? null,
         freeCashFlow: r.freeCashFlowBounds ?? null,
         debtToEquity: r.debtToEquityBounds ?? null,
         pegRatio: r.pegRatioBounds ?? null,
@@ -98,8 +98,6 @@ const metricsMetaList = computed(() => Object.values(metricsMeta))
                         <div class="defs-list">
                             <div class="def-card" v-for="m in metricsMetaList" :key="m.short">
                                 <div class="def-line"><strong>{{ m.short }}</strong> - {{ m.full }}</div>
-                                <div class="def-sub"><span class="label">Calculated by:</span> {{ m.calc }}</div>
-                                <div class="def-sub"><span class="label">Value meaning:</span> {{ m.meaning }}</div>
                             </div>
                         </div>
 
@@ -118,12 +116,12 @@ const metricsMetaList = computed(() => Object.values(metricsMeta))
                                         <td>{{ fmtBounds(firstBounds.oneYearSalesGrowth, true) }}</td>
                                     </tr>
                                     <tr>
-                                        <td>5Y Sales</td>
-                                        <td>{{ fmtBounds(firstBounds.fiveYearSalesGrowth, true) }}</td>
+                                        <td>4Y Sales</td>
+                                        <td>{{ fmtBounds(firstBounds.fourYearSalesGrowth, true) }}</td>
                                     </tr>
                                     <tr>
-                                        <td>5Y Earnings</td>
-                                        <td>{{ fmtBounds(firstBounds.fiveYearEarningsGrowth, true) }}</td>
+                                        <td>4Y Earnings</td>
+                                        <td>{{ fmtBounds(firstBounds.fourYearEarningsGrowth, true) }}</td>
                                     </tr>
                                     <tr>
                                         <td>FCF</td>

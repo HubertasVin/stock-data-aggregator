@@ -27,13 +27,16 @@ public class EfSymbolMetricsRepository : ISymbolMetricsRepository
                     Symbol = dto.Symbol,
                     Date = dto.Date,
                     UpdateDate = now,
+
                     OneYearSalesGrowth = dto.OneYearSalesGrowth,
-                    FiveYearSalesGrowth = dto.FiveYearSalesGrowth,
-                    FiveYearEarningsGrowth = dto.FiveYearEarningsGrowth,
+                    FourYearSalesGrowth = dto.FourYearSalesGrowth,
+                    FourYearEarningsGrowth = dto.FourYearEarningsGrowth,
+
                     FreeCashFlow = dto.FreeCashFlow,
                     DebtToEquity = dto.DebtToEquity,
                     PegRatio = dto.PegRatio,
                     ReturnOnEquity = dto.ReturnOnEquity,
+
                     EsgTotal = dto.EsgTotal,
                     EsgEnvironment = dto.EsgEnvironment,
                     EsgSocial = dto.EsgSocial,
@@ -46,12 +49,14 @@ public class EfSymbolMetricsRepository : ISymbolMetricsRepository
         {
             existing.UpdateDate = now;
             existing.OneYearSalesGrowth = dto.OneYearSalesGrowth;
-            existing.FiveYearSalesGrowth = dto.FiveYearSalesGrowth;
-            existing.FiveYearEarningsGrowth = dto.FiveYearEarningsGrowth;
+            existing.FourYearSalesGrowth = dto.FourYearSalesGrowth;
+            existing.FourYearEarningsGrowth = dto.FourYearEarningsGrowth;
+
             existing.FreeCashFlow = dto.FreeCashFlow;
             existing.DebtToEquity = dto.DebtToEquity;
             existing.PegRatio = dto.PegRatio;
             existing.ReturnOnEquity = dto.ReturnOnEquity;
+
             existing.EsgTotal = dto.EsgTotal;
             existing.EsgEnvironment = dto.EsgEnvironment;
             existing.EsgSocial = dto.EsgSocial;
@@ -77,8 +82,8 @@ public class EfSymbolMetricsRepository : ISymbolMetricsRepository
                 Date = e.Date,
                 UpdateDate = e.UpdateDate,
                 OneYearSalesGrowth = e.OneYearSalesGrowth,
-                FiveYearSalesGrowth = e.FiveYearSalesGrowth,
-                FiveYearEarningsGrowth = e.FiveYearEarningsGrowth,
+                FourYearSalesGrowth = e.FourYearSalesGrowth,
+                FourYearEarningsGrowth = e.FourYearEarningsGrowth,
                 FreeCashFlow = e.FreeCashFlow,
                 DebtToEquity = e.DebtToEquity,
                 PegRatio = e.PegRatio,
@@ -107,8 +112,8 @@ public class EfSymbolMetricsRepository : ISymbolMetricsRepository
                 Date = e.Date,
                 UpdateDate = e.UpdateDate,
                 OneYearSalesGrowth = e.OneYearSalesGrowth,
-                FiveYearSalesGrowth = e.FiveYearSalesGrowth,
-                FiveYearEarningsGrowth = e.FiveYearEarningsGrowth,
+                FourYearSalesGrowth = e.FourYearSalesGrowth,
+                FourYearEarningsGrowth = e.FourYearEarningsGrowth,
                 FreeCashFlow = e.FreeCashFlow,
                 DebtToEquity = e.DebtToEquity,
                 PegRatio = e.PegRatio,

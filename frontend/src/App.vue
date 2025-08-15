@@ -1,71 +1,66 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useRouter, RouterLink, RouterView } from 'vue-router'
-import { getAuthToken, isAuthenticated, setAuthToken } from './api'
+import { useRouter } from 'vue-router'
 import AddSymbolModal from './components/AddSymbolModal.vue'
+import { isAuthenticated, setAuthToken } from './api'
 
 const router = useRouter()
-const theme = ref<'light' | 'dark'>('light')
+
 const authed = ref(isAuthenticated())
-const openAdd = ref(false)
+const addOpen = ref(false)
+const theme = ref(localStorage.getItem('theme') || 'light')
 
-function applyTheme(t: 'light' | 'dark') {
-  theme.value = t
-  document.documentElement.setAttribute('data-theme', t)
-  localStorage.setItem('theme', t)
+function applyTheme() {
+  if (theme.value === 'dark') document.documentElement.setAttribute('data-theme', 'dark')
+  else document.documentElement.removeAttribute('data-theme')
 }
-function toggleTheme() { applyTheme(theme.value === 'light' ? 'dark' : 'light') }
-
-function onAuthChanged(e: Event) {
-  authed.value = !!getAuthToken()
-  // close any modal on auth boundary changes
-  openAdd.value = false
+function toggleTheme() {
+  theme.value = theme.value === 'dark' ? 'light' : 'dark'
+  localStorage.setItem('theme', theme.value)
+  applyTheme()
 }
 function logout() {
   setAuthToken(null)
   authed.value = false
-  window.dispatchEvent(new CustomEvent('auth-changed', { detail: { authed: false } }))
   router.push('/login')
 }
 function onAdded() {
-  // let Home.vue know to refresh
+  addOpen.value = false
   window.dispatchEvent(new CustomEvent('symbol-added'))
-  openAdd.value = false
+}
+function onAuthChanged(e: Event) {
+  const detail = (e as CustomEvent).detail as any
+  authed.value = !!detail?.authed
 }
 
 onMounted(() => {
-  document.title = 'HubertasVin stock data aggregator'
-  const saved = localStorage.getItem('theme') as 'light' | 'dark' | null
-  applyTheme(saved === 'dark' ? 'dark' : 'light')
-  authed.value = !!getAuthToken()
-  openAdd.value = false
-  window.addEventListener('auth-changed', onAuthChanged)
+  applyTheme()
+  window.addEventListener('auth-changed', onAuthChanged as EventListener)
 })
 onUnmounted(() => {
-  window.removeEventListener('auth-changed', onAuthChanged)
+  window.removeEventListener('auth-changed', onAuthChanged as EventListener)
 })
 </script>
 
 <template>
   <div class="container">
-    <div class="header">
+    <header class="header">
       <div class="title"><span class="brand">HubertasVin</span> stock data aggregator</div>
       <div class="header-actions">
-        <button class="toggle" @click="toggleTheme" aria-label="Switch theme">
-          <img v-if="theme === 'light'" src="/moon.svg" alt="" class="icon-20 icon-img" />
-          <img v-else src="/sun.svg" alt="" class="icon-20 icon-img" />
+        <button class="toggle" aria-label="Toggle theme" @click="toggleTheme">
+          <img v-if="theme === 'dark'" class="icon-img" src="/sun.svg" alt="Toggle theme" />
+          <img v-if="theme === 'light'" class="icon-img" src="/moon.svg" alt="Toggle theme" />
         </button>
-
-        <RouterLink v-if="!authed" class="btn" to="/login">Login</RouterLink>
+        <button v-if="authed" class="btn" @click="addOpen = true">Add symbol</button>
+        <router-link v-if="!authed" class="btn" to="/login">Login</router-link>
         <button v-else class="btn" @click="logout">Logout</button>
-
-        <button v-if="authed" class="btn btn-primary" @click="openAdd = true">+ Add symbol</button>
       </div>
-    </div>
+    </header>
 
-    <RouterView />
-    <footer>Powered by StockDataAggregator</footer>
+    <router-view />
 
-    <AddSymbolModal v-if="authed" v-model:open="openAdd" @added="onAdded" />
+    <footer>© {{ new Date().getFullYear() }}</footer>
   </div>
+
+  <AddSymbolModal :open="addOpen" @update:open="v => (addOpen = v)" @added="onAdded" />
 </template>

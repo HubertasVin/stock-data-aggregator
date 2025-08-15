@@ -30,7 +30,7 @@ public class PeriodicFetchHostedService : BackgroundService
             {
                 using var scope = _scopeFactory.CreateScope();
                 var repo = scope.ServiceProvider.GetRequiredService<ISymbolMetricsRepository>();
-                var fetcher = scope.ServiceProvider.GetRequiredService<IFmpClient>();
+                var fetcher = scope.ServiceProvider.GetRequiredService<IMarketDataClient>();
 
                 var now = DateTime.UtcNow;
                 var symbols = await repo.GetAllSymbolsAsync();

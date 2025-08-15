@@ -2,7 +2,7 @@ using StockDataAggregator.Application.Dtos;
 
 namespace StockDataAggregator.Application.Interfaces;
 
-public interface IFmpClient
+public interface IMarketDataClient
 {
     Task<SymbolMetricsDto?> FetchAsync(string symbol);
 }

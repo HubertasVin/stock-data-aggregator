@@ -18,8 +18,9 @@ public class SymbolMetrics
     public DateTime UpdateDate { get; set; } = DateTime.UtcNow;
 
     public decimal OneYearSalesGrowth { get; set; }
-    public decimal FiveYearSalesGrowth { get; set; }
-    public decimal FiveYearEarningsGrowth { get; set; }
+    public decimal FourYearSalesGrowth { get; set; }
+    public decimal FourYearEarningsGrowth { get; set; }
+
     public decimal FreeCashFlow { get; set; }
     public decimal DebtToEquity { get; set; }
     public decimal PegRatio { get; set; }

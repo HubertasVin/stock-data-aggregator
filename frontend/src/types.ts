@@ -1,6 +1,12 @@
 export interface MetricBounds {
-  lower?: number | null;
-  upper?: number | null;
+  lower: number | null;
+  upper: number | null;
+}
+
+export interface YearDatum {
+  year: number;
+  revenue?: number | null;
+  earnings?: number | null;
 }
 
 export interface BalancedRiskMetrics {
@@ -8,21 +14,24 @@ export interface BalancedRiskMetrics {
   date: string;
   updateDate: string;
 
-  oneYearSalesGrowth: number;
-  fiveYearSalesGrowth: number;
-  fiveYearEarningsGrowth: number;
-  freeCashFlow: number;
-  debtToEquity: number;
-  pegRatio: number;
-  returnOnEquity: number;
+  oneYearSalesGrowth: number | null;
+  fourYearSalesGrowth: number | null;
+  fourYearEarningsGrowth: number | null;
+
+  freeCashFlow: number | null;
+  debtToEquity: number | null;
+  pegRatio: number | null;
+  returnOnEquity: number | null;
 
   oneYearSalesGrowthBounds?: MetricBounds | null;
-  fiveYearSalesGrowthBounds?: MetricBounds | null;
-  fiveYearEarningsGrowthBounds?: MetricBounds | null;
+  fourYearSalesGrowthBounds?: MetricBounds | null;
+  fourYearEarningsGrowthBounds?: MetricBounds | null;
   freeCashFlowBounds?: MetricBounds | null;
   debtToEquityBounds?: MetricBounds | null;
   pegRatioBounds?: MetricBounds | null;
   returnOnEquityBounds?: MetricBounds | null;
 
-  score?: number | null;
+  financialsYearly?: YearDatum[];
+
+  score: number;
 }

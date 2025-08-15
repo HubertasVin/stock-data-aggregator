@@ -5,10 +5,10 @@ namespace StockDataAggregator.Application.Services;
 
 public class BalancedRiskDataService
 {
-    private readonly IFmpClient _fetcher;
+    private readonly IMarketDataClient _fetcher;
     private readonly ISymbolMetricsRepository _repo;
 
-    public BalancedRiskDataService(IFmpClient fetcher, ISymbolMetricsRepository repo)
+    public BalancedRiskDataService(IMarketDataClient fetcher, ISymbolMetricsRepository repo)
     {
         _fetcher = fetcher;
         _repo = repo;

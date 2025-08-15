@@ -1,67 +1,72 @@
 export type MetricKey =
   | "oneYearSalesGrowth"
-  | "fiveYearSalesGrowth"
-  | "fiveYearEarningsGrowth"
+  | "fourYearSalesGrowth"
+  | "fourYearEarningsGrowth"
   | "freeCashFlow"
   | "debtToEquity"
   | "pegRatio"
-  | "returnOnEquity";
+  | "returnOnEquity"
+  | "score";
 
-export interface MetricInfo {
+export interface MetricMeta {
+  key: MetricKey;
   short: string;
   full: string;
-  calc: string;
-  meaning: string;
+  isPercent?: boolean;
+  higherIsBetter?: boolean;
 }
 
-export const metricsMeta: Record<MetricKey, MetricInfo> = {
+export const metricsMeta: Record<MetricKey, MetricMeta> = {
   oneYearSalesGrowth: {
+    key: "oneYearSalesGrowth",
     short: "1Y Sales",
-    full: "One-Year Sales Growth",
-    calc: "TTM (trailing twelve months) revenue now vs TTM one year ago.",
-    meaning:
-      "Higher = faster recent revenue growth. Negative = revenue shrank vs last year.",
+    full: "One-year Revenue Growth",
+    isPercent: true,
+    higherIsBetter: true,
   },
-  fiveYearSalesGrowth: {
-    short: "5Y Sales",
-    full: "Five-Year Sales Growth",
-    calc: "CAGR (compound annual growth rate) of revenue per share over 5 years.",
-    meaning:
-      "Higher = long-term sales expansion. Negative = multi-year contraction.",
+  fourYearSalesGrowth: {
+    key: "fourYearSalesGrowth",
+    short: "4Y Sales",
+    full: "Four-year Revenue Growth (compounded)",
+    isPercent: true,
+    higherIsBetter: true,
   },
-  fiveYearEarningsGrowth: {
-    short: "5Y Earnings",
-    full: "Five-Year Earnings Growth",
-    calc: "CAGR of net income per share over 5 years.",
-    meaning:
-      "Higher = profits compounding. Negative = profits fell or turned to losses.",
+  fourYearEarningsGrowth: {
+    key: "fourYearEarningsGrowth",
+    short: "4Y Earnings",
+    full: "Four-year Net Income Growth (compounded)",
+    isPercent: true,
+    higherIsBetter: true,
   },
   freeCashFlow: {
+    key: "freeCashFlow",
     short: "FCF",
     full: "Free Cash Flow",
-    calc: "Operating cash flow minus capital expenditures (capex).",
-    meaning:
-      "Higher/positive = cash left after investments. Negative = cash burn (heavy capex or weak operations).",
+    higherIsBetter: true,
   },
   debtToEquity: {
+    key: "debtToEquity",
     short: "D/E",
     full: "Debt to Equity",
-    calc: "Total debt divided by shareholders’ equity.",
-    meaning:
-      "Lower = less leverage risk. Negative often means negative equity, which is a red flag.",
+    higherIsBetter: false,
   },
   pegRatio: {
+    key: "pegRatio",
     short: "PEG",
-    full: "Price/Earnings-to-Growth",
-    calc: "P/E (price-to-earnings) divided by expected earnings growth.",
-    meaning:
-      "Lower = cheaper vs growth. Negative often comes from negative earnings or growth → interpretation is unreliable.",
+    full: "Price/Earnings-to-Growth Ratio",
+    higherIsBetter: false,
   },
   returnOnEquity: {
+    key: "returnOnEquity",
     short: "ROE",
     full: "Return on Equity",
-    calc: "Net income divided by average shareholders’ equity.",
-    meaning:
-      "Higher = efficient use of equity. Negative = losses or negative equity.",
+    isPercent: true,
+    higherIsBetter: true,
+  },
+  score: {
+    key: "score",
+    short: "Score",
+    full: "Composite Balanced Risk Score",
+    higherIsBetter: true,
   },
 };

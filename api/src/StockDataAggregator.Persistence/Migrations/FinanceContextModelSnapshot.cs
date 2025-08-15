@@ -22,6 +22,36 @@ namespace StockDataAggregator.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("StockDataAggregator.Persistence.Entities.FinancialsYearly", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Earnings")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("Revenue")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Symbol")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Symbol", "Year")
+                        .IsUnique();
+
+                    b.ToTable("FinancialsYearly");
+                });
+
             modelBuilder.Entity("StockDataAggregator.Persistence.Entities.SymbolMetrics", b =>
                 {
                     b.Property<int>("Id")
@@ -51,10 +81,10 @@ namespace StockDataAggregator.Persistence.Migrations
                     b.Property<decimal>("EsgTotal")
                         .HasColumnType("numeric");
 
-                    b.Property<decimal>("FiveYearEarningsGrowth")
+                    b.Property<decimal>("FourYearEarningsGrowth")
                         .HasColumnType("numeric");
 
-                    b.Property<decimal>("FiveYearSalesGrowth")
+                    b.Property<decimal>("FourYearSalesGrowth")
                         .HasColumnType("numeric");
 
                     b.Property<decimal>("FreeCashFlow")
