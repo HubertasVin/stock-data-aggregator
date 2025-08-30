@@ -1,3 +1,4 @@
+// File: Persistence/Entities/SymbolMetrics.cs
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -26,7 +27,9 @@ public class SymbolMetrics
     public decimal PegRatio { get; set; }
     public decimal ReturnOnEquity { get; set; }
 
-    // ESG
+    [Column(TypeName = "numeric")]
+    public decimal? DividendYield { get; set; }
+
     public decimal EsgTotal { get; set; }
     public decimal EsgEnvironment { get; set; }
     public decimal EsgSocial { get; set; }

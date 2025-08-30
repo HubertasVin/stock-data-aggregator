@@ -12,7 +12,7 @@ using StockDataAggregator.Persistence;
 namespace StockDataAggregator.Persistence.Migrations
 {
     [DbContext(typeof(FinanceContext))]
-    [Migration("20250815153240_Initial")]
+    [Migration("20250830082917_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -67,6 +67,9 @@ namespace StockDataAggregator.Persistence.Migrations
                         .HasColumnType("date");
 
                     b.Property<decimal>("DebtToEquity")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal?>("DividendYield")
                         .HasColumnType("numeric");
 
                     b.Property<decimal>("EsgEnvironment")

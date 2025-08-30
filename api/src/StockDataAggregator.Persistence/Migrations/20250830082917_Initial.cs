@@ -44,6 +44,7 @@ namespace StockDataAggregator.Persistence.Migrations
                     DebtToEquity = table.Column<decimal>(type: "numeric", nullable: false),
                     PegRatio = table.Column<decimal>(type: "numeric", nullable: false),
                     ReturnOnEquity = table.Column<decimal>(type: "numeric", nullable: false),
+                    DividendYield = table.Column<decimal>(type: "numeric", nullable: true),
                     EsgTotal = table.Column<decimal>(type: "numeric", nullable: false),
                     EsgEnvironment = table.Column<decimal>(type: "numeric", nullable: false),
                     EsgSocial = table.Column<decimal>(type: "numeric", nullable: false),

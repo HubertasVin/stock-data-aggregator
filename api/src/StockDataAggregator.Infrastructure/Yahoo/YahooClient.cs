@@ -68,11 +68,10 @@ public class YahooDataClient : IMarketDataClient
         static decimal? TryGetRawDecimal(JsonElement node)
         {
             if (node.ValueKind == JsonValueKind.Object && node.TryGetProperty("raw", out var raw))
-            {
                 return raw.ValueKind == JsonValueKind.Number && raw.TryGetDecimal(out var d)
                     ? d
                     : null;
-            }
+
             if (node.ValueKind == JsonValueKind.Number && node.TryGetDecimal(out var bare))
                 return bare;
 
@@ -93,7 +92,6 @@ public class YahooDataClient : IMarketDataClient
 
         static decimal ExtractFreeCashFlow(JsonElement resultRoot)
         {
-            // financialData.freeCashflow.raw
             if (
                 TryGet(resultRoot, "financialData", out var financialData)
                 && TryGet(financialData, "freeCashflow", out var freeCashflowNode)
@@ -104,7 +102,6 @@ public class YahooDataClient : IMarketDataClient
                     return d1;
             }
 
-            // cashflowStatementHistory.cashflowStatements[0].freeCashFlow.raw
             if (
                 TryGet(resultRoot, "cashflowStatementHistory", out var cfh)
                 && TryGet(cfh, "cashflowStatements", out var statements)
@@ -121,7 +118,6 @@ public class YahooDataClient : IMarketDataClient
                         return d2;
                 }
 
-                // Fallback compute: operatingCashflow - capitalExpenditures
                 decimal op = 0,
                     capex = 0;
                 bool haveOp = false,
@@ -262,6 +258,11 @@ public class YahooDataClient : IMarketDataClient
         var roe = TryGetDecimal(result, "financialData", "returnOnEquity") ?? 0m;
         var de = TryGetDecimal(result, "financialData", "debtToEquity") / 100 ?? 0m;
 
+        decimal? dividendYield =
+            TryGetDecimal(result, "summaryDetail", "dividendYield")
+            ?? TryGetDecimal(result, "summaryDetail", "trailingAnnualDividendYield")
+            ?? TryGetDecimal(result, "defaultKeyStatistics", "trailingAnnualDividendYield");
+
         var fcf = ExtractFreeCashFlow(result);
 
         decimal esgTotal = 0m,
@@ -303,6 +304,8 @@ public class YahooDataClient : IMarketDataClient
             DebtToEquity = de,
             PegRatio = peg ?? 0m,
             ReturnOnEquity = roe,
+
+            DividendYield = dividendYield,
 
             EsgTotal = esgTotal,
             EsgEnvironment = esgEnv,

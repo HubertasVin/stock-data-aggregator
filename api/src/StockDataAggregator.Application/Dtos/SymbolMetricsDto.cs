@@ -12,25 +12,23 @@ public class SymbolMetricsDto
     public DateTime Date { get; set; }
     public DateTime UpdateDate { get; set; }
 
-    // New names
     public decimal OneYearSalesGrowth { get; set; }
     public decimal FourYearSalesGrowth { get; set; }
     public decimal FourYearEarningsGrowth { get; set; }
 
-    // Kept
     public decimal FreeCashFlow { get; set; }
     public decimal DebtToEquity { get; set; }
     public decimal PegRatio { get; set; }
     public decimal ReturnOnEquity { get; set; }
 
-    // ESG
+    public decimal? DividendYield { get; set; }
+
     public decimal EsgTotal { get; set; }
     public decimal EsgEnvironment { get; set; }
     public decimal EsgSocial { get; set; }
     public decimal EsgGovernance { get; set; }
     public DateTime? EsgPublicationDate { get; set; }
 
-    // New: yearly snapshots (will be stored as JSONB in DB)
     public List<YearValue> RevenueYearly { get; set; } = new();
     public List<YearValue> EarningsYearly { get; set; } = new();
 }

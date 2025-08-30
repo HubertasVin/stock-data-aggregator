@@ -66,6 +66,9 @@ namespace StockDataAggregator.Persistence.Migrations
                     b.Property<decimal>("DebtToEquity")
                         .HasColumnType("numeric");
 
+                    b.Property<decimal?>("DividendYield")
+                        .HasColumnType("numeric");
+
                     b.Property<decimal>("EsgEnvironment")
                         .HasColumnType("numeric");
 
