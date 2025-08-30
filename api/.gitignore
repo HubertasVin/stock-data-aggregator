@@ -1,0 +1,8 @@
+src/StockDataAggregator.Api/obj/
+src/StockDataAggregator.Api/bin/
+src/StockDataAggregator.Application/obj/
+src/StockDataAggregator.Application/bin/
+src/StockDataAggregator.Infrastructure/obj/
+src/StockDataAggregator.Infrastructure/bin/
+src/StockDataAggregator.Persistence/obj/
+src/StockDataAggregator.Persistence/bin/
