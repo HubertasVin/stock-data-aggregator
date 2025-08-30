@@ -74,7 +74,7 @@ const allYears = computed<number[]>(() => {
 			<div v-else-if="error" class="status error">{{ error }}</div>
 			<div v-else-if="data">
 				<div class="table-wrap mini modal-table-wrap">
-					<table class="bounds-table compact">
+					<table class="bounds-table compact details-table">
 						<tbody>
 							<tr>
 								<th>Date</th>
@@ -108,8 +108,7 @@ const allYears = computed<number[]>(() => {
 							</tr>
 							<tr>
 								<th>PEG</th>
-								<td>{{ data.pegRatio?.toPrecision ? data.pegRatio.toPrecision(4) : (data.pegRatio ??
-									'—') }}</td>
+								<td>{{ data.pegRatio?.toPrecision ? data.pegRatio.toPrecision(4) : (data.pegRatio ?? '—') }}</td>
 							</tr>
 							<tr>
 								<th>Return on Equity</th>
@@ -138,8 +137,7 @@ const allYears = computed<number[]>(() => {
 							</tr>
 							<tr>
 								<th>ESG Publication</th>
-								<td>{{ data.esgPublicationDate ? fmtLocalDateYYYYMMDD(data.esgPublicationDate) : '—' }}
-								</td>
+								<td>{{ data.esgPublicationDate ? fmtLocalDateYYYYMMDD(data.esgPublicationDate) : '—' }}</td>
 							</tr>
 						</tbody>
 					</table>
@@ -148,7 +146,7 @@ const allYears = computed<number[]>(() => {
 				<div v-if="allYears.length" class="modal-table-wrap">
 					<div class="subtle">Yearly Financials</div>
 					<div class="table-wrap mini">
-						<table class="bounds-table compact">
+						<table class="bounds-table compact details-table">
 							<thead>
 								<tr>
 									<th>Year</th>

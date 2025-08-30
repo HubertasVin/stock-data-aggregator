@@ -388,6 +388,18 @@ footer {
   border-color: transparent;
 }
 
+/* Add Symbol modal spacing */
+.modal > .modal-title {
+  margin-bottom: 8px;
+}
+.modal > .input {
+  margin-top: 8px;
+}
+.modal-actions {
+  margin-top: 12px;
+  gap: 8px;
+}
+
 /* Modal */
 .modal-backdrop {
   position: fixed;
@@ -412,8 +424,12 @@ footer {
   font-weight: 600;
   margin: 0;
 }
+
+/* Details popup: width wraps table and 4rem column gap */
 .modal--details {
-  width: min(96vw, 1000px);
+  display: inline-block;
+  width: auto;
+  max-width: 96vw;
 }
 .modal-header {
   display: flex;
@@ -423,4 +439,18 @@ footer {
 }
 .modal-table-wrap {
   margin-bottom: 12px;
+}
+.modal--details .table-wrap {
+  overflow: auto;
+}
+.modal--details .table-wrap.mini table {
+  width: auto;
+}
+.details-table {
+  border-collapse: separate;
+  border-spacing: 4rem 0;
+}
+.details-table th,
+.details-table td {
+  white-space: nowrap;
 }
