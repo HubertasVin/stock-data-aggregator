@@ -68,10 +68,11 @@ public class YahooDataClient : IMarketDataClient
         static decimal? TryGetRawDecimal(JsonElement node)
         {
             if (node.ValueKind == JsonValueKind.Object && node.TryGetProperty("raw", out var raw))
+            {
                 return raw.ValueKind == JsonValueKind.Number && raw.TryGetDecimal(out var d)
                     ? d
                     : null;
-
+            }
             if (node.ValueKind == JsonValueKind.Number && node.TryGetDecimal(out var bare))
                 return bare;
 
@@ -88,6 +89,26 @@ public class YahooDataClient : IMarketDataClient
                 cur = nx;
             }
             return TryGetRawDecimal(cur);
+        }
+
+        static string? TryGetString(JsonElement root, params string[] path)
+        {
+            var cur = root;
+            foreach (var p in path)
+            {
+                if (!cur.TryGetProperty(p, out var nx))
+                    return null;
+                cur = nx;
+            }
+            if (cur.ValueKind == JsonValueKind.String)
+                return cur.GetString();
+            if (
+                cur.ValueKind == JsonValueKind.Object
+                && cur.TryGetProperty("raw", out var raw)
+                && raw.ValueKind == JsonValueKind.String
+            )
+                return raw.GetString();
+            return null;
         }
 
         static decimal ExtractFreeCashFlow(JsonElement resultRoot)
@@ -258,11 +279,6 @@ public class YahooDataClient : IMarketDataClient
         var roe = TryGetDecimal(result, "financialData", "returnOnEquity") ?? 0m;
         var de = TryGetDecimal(result, "financialData", "debtToEquity") / 100 ?? 0m;
 
-        decimal? dividendYield =
-            TryGetDecimal(result, "summaryDetail", "dividendYield")
-            ?? TryGetDecimal(result, "summaryDetail", "trailingAnnualDividendYield")
-            ?? TryGetDecimal(result, "defaultKeyStatistics", "trailingAnnualDividendYield");
-
         var fcf = ExtractFreeCashFlow(result);
 
         decimal esgTotal = 0m,
@@ -290,11 +306,18 @@ public class YahooDataClient : IMarketDataClient
                 esgPub = DateTime.SpecifyKind(new DateTime(y.Value, m.Value, 1), DateTimeKind.Utc);
         }
 
+        var currency =
+            TryGetString(result, "financialData", "financialCurrency")
+            ?? TryGetString(result, "summaryDetail", "currency")
+            ?? "";
+
         return new SymbolMetricsDto
         {
             Symbol = symbol,
             Date = DateTime.UtcNow.Date,
             UpdateDate = DateTime.UtcNow,
+
+            Currency = currency,
 
             OneYearSalesGrowth = oneYearSales,
             FourYearSalesGrowth = fourYearSales,
@@ -304,8 +327,6 @@ public class YahooDataClient : IMarketDataClient
             DebtToEquity = de,
             PegRatio = peg ?? 0m,
             ReturnOnEquity = roe,
-
-            DividendYield = dividendYield,
 
             EsgTotal = esgTotal,
             EsgEnvironment = esgEnv,

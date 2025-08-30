@@ -5,6 +5,9 @@ public class BalancedRiskAnalysisDto
     public string Symbol { get; set; } = null!;
     public DateTime Date { get; set; }
     public DateTime UpdateDate { get; set; }
+
+    public string Currency { get; set; } = "";
+
     public decimal OneYearSalesGrowth { get; set; }
     public decimal FourYearSalesGrowth { get; set; }
     public decimal FourYearEarningsGrowth { get; set; }

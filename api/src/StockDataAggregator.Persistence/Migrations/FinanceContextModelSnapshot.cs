@@ -60,13 +60,15 @@ namespace StockDataAggregator.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("date");
 
                     b.Property<decimal>("DebtToEquity")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("DividendYield")
                         .HasColumnType("numeric");
 
                     b.Property<decimal>("EsgEnvironment")

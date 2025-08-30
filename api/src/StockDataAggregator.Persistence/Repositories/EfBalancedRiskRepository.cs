@@ -28,6 +28,8 @@ public class EfSymbolMetricsRepository : ISymbolMetricsRepository
                     Date = dto.Date,
                     UpdateDate = now,
 
+                    Currency = dto.Currency,
+
                     OneYearSalesGrowth = dto.OneYearSalesGrowth,
                     FourYearSalesGrowth = dto.FourYearSalesGrowth,
                     FourYearEarningsGrowth = dto.FourYearEarningsGrowth,
@@ -36,8 +38,6 @@ public class EfSymbolMetricsRepository : ISymbolMetricsRepository
                     DebtToEquity = dto.DebtToEquity,
                     PegRatio = dto.PegRatio,
                     ReturnOnEquity = dto.ReturnOnEquity,
-
-                    DividendYield = dto.DividendYield,
 
                     EsgTotal = dto.EsgTotal,
                     EsgEnvironment = dto.EsgEnvironment,
@@ -50,6 +50,7 @@ public class EfSymbolMetricsRepository : ISymbolMetricsRepository
         else
         {
             existing.UpdateDate = now;
+            existing.Currency = dto.Currency;
             existing.OneYearSalesGrowth = dto.OneYearSalesGrowth;
             existing.FourYearSalesGrowth = dto.FourYearSalesGrowth;
             existing.FourYearEarningsGrowth = dto.FourYearEarningsGrowth;
@@ -58,8 +59,6 @@ public class EfSymbolMetricsRepository : ISymbolMetricsRepository
             existing.DebtToEquity = dto.DebtToEquity;
             existing.PegRatio = dto.PegRatio;
             existing.ReturnOnEquity = dto.ReturnOnEquity;
-
-            existing.DividendYield = dto.DividendYield;
 
             existing.EsgTotal = dto.EsgTotal;
             existing.EsgEnvironment = dto.EsgEnvironment;
@@ -85,6 +84,7 @@ public class EfSymbolMetricsRepository : ISymbolMetricsRepository
                 Symbol = e.Symbol,
                 Date = e.Date,
                 UpdateDate = e.UpdateDate,
+                Currency = e.Currency,
                 OneYearSalesGrowth = e.OneYearSalesGrowth,
                 FourYearSalesGrowth = e.FourYearSalesGrowth,
                 FourYearEarningsGrowth = e.FourYearEarningsGrowth,
@@ -92,7 +92,6 @@ public class EfSymbolMetricsRepository : ISymbolMetricsRepository
                 DebtToEquity = e.DebtToEquity,
                 PegRatio = e.PegRatio,
                 ReturnOnEquity = e.ReturnOnEquity,
-                DividendYield = e.DividendYield,
                 EsgTotal = e.EsgTotal,
                 EsgEnvironment = e.EsgEnvironment,
                 EsgSocial = e.EsgSocial,
@@ -116,6 +115,7 @@ public class EfSymbolMetricsRepository : ISymbolMetricsRepository
                 Symbol = e.Symbol,
                 Date = e.Date,
                 UpdateDate = e.UpdateDate,
+                Currency = e.Currency,
                 OneYearSalesGrowth = e.OneYearSalesGrowth,
                 FourYearSalesGrowth = e.FourYearSalesGrowth,
                 FourYearEarningsGrowth = e.FourYearEarningsGrowth,
@@ -123,7 +123,6 @@ public class EfSymbolMetricsRepository : ISymbolMetricsRepository
                 DebtToEquity = e.DebtToEquity,
                 PegRatio = e.PegRatio,
                 ReturnOnEquity = e.ReturnOnEquity,
-                DividendYield = e.DividendYield,
                 EsgTotal = e.EsgTotal,
                 EsgEnvironment = e.EsgEnvironment,
                 EsgSocial = e.EsgSocial,

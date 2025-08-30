@@ -38,29 +38,13 @@ public sealed class BalancedRiskScoringService
                 ? 0m
                 : (valsFCF[valsFCF.Count / 2] + valsFCF[(valsFCF.Count - 1) / 2]) / 2m;
 
-        double s1y = ScoreHigher(
-            latest.OneYearSalesGrowth,
-            b.OneYearSalesGrowth,
-            fallbackHiFactor: 2.0
-        );
-        double s4yS = ScoreHigher(
-            latest.FourYearSalesGrowth,
-            b.FourYearSalesGrowth,
-            fallbackHiFactor: 1.5
-        );
-        double s4yE = ScoreHigher(
-            latest.FourYearEarningsGrowth,
-            b.FourYearEarningsGrowth,
-            fallbackHiFactor: 1.5
-        );
+        double s1y = ScoreHigher(latest.OneYearSalesGrowth, b.OneYearSalesGrowth, 2.0);
+        double s4yS = ScoreHigher(latest.FourYearSalesGrowth, b.FourYearSalesGrowth, 1.5);
+        double s4yE = ScoreHigher(latest.FourYearEarningsGrowth, b.FourYearEarningsGrowth, 1.5);
         double sFCF = ScoreFcf(latest.FreeCashFlow, b.FreeCashFlow, fcfMedian);
-        double sDE = ScoreLower(
-            CleanDebtToEquity(latest.DebtToEquity),
-            b.DebtToEquity,
-            idealLow: 0m
-        );
-        double sPEG = ScoreLower(CleanPeg(latest.PegRatio), b.PegRatio, idealLow: 0m);
-        double sROE = ScoreHigher(latest.ReturnOnEquity, b.ReturnOnEquity, fallbackHiFactor: 2.0);
+        double sDE = ScoreLower(CleanDebtToEquity(latest.DebtToEquity), b.DebtToEquity, 0m);
+        double sPEG = ScoreLower(CleanPeg(latest.PegRatio), b.PegRatio, 0m);
+        double sROE = ScoreHigher(latest.ReturnOnEquity, b.ReturnOnEquity, 2.0);
 
         const double W_1Y = 0.15;
         const double W_4YS = 0.10;
@@ -82,11 +66,9 @@ public sealed class BalancedRiskScoringService
         var raw = Math.Clamp(composite, 0.0, 1.0);
         var score = (int)Math.Clamp(Math.Round(1 + 9 * raw, MidpointRounding.AwayFromZero), 1, 10);
 
-        return BuildDto(latest, score, b);
+        return BuildDto(latest, score, _bounds.CurrentValue);
     }
 
-    // Higher is better. If both bounds exist, linear between [lower..upper].
-    // If only lower exists, ramp from lower to (lower * fallbackHiFactor).
     private static double ScoreHigher(decimal value, MetricBounds mb, double fallbackHiFactor)
     {
         var lo = mb.Lower;
@@ -112,8 +94,6 @@ public sealed class BalancedRiskScoringService
         return 0.5;
     }
 
-    // Lower is better. If both exist, linear across [lower..upper] inverted.
-    // If only upper exists, map [0..upper] → [1..0].
     private static double ScoreLower(decimal value, MetricBounds mb, decimal idealLow)
     {
         var lo = mb.Lower ?? idealLow;
@@ -128,7 +108,6 @@ public sealed class BalancedRiskScoringService
         return Linear((double)(lo - value), 0.0, (double)lo);
     }
 
-    // FCF: log-scaled to reduce outlier dominance; scaled by ~2× median
     private static double ScoreFcf(decimal value, MetricBounds _mb, decimal median)
     {
         if (value <= 0)
@@ -138,7 +117,6 @@ public sealed class BalancedRiskScoringService
         return Math.Clamp(s, 0.0, 1.0);
     }
 
-    // Map x in [min..min+range] to [0..1]
     private static double Linear(double x, double min, double range)
     {
         if (range <= 0.0)
@@ -147,11 +125,10 @@ public sealed class BalancedRiskScoringService
         return Math.Clamp(t, 0.0, 1.0);
     }
 
-    // Negative/huge PEG handling
     private static decimal CleanPeg(decimal x)
     {
         if (x <= 0)
-            return 3.0m; // treat negative/undefined PEG as middling
+            return 3.0m;
         if (x > 1000)
             return 1000m;
         return x;
@@ -176,6 +153,7 @@ public sealed class BalancedRiskScoringService
             Symbol = e.Symbol,
             Date = e.Date,
             UpdateDate = e.UpdateDate,
+            Currency = e.Currency,
 
             OneYearSalesGrowth = e.OneYearSalesGrowth,
             FourYearSalesGrowth = e.FourYearSalesGrowth,

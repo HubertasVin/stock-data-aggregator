@@ -12,6 +12,8 @@ public class SymbolMetricsDto
     public DateTime Date { get; set; }
     public DateTime UpdateDate { get; set; }
 
+    public string Currency { get; set; } = "";
+
     public decimal OneYearSalesGrowth { get; set; }
     public decimal FourYearSalesGrowth { get; set; }
     public decimal FourYearEarningsGrowth { get; set; }
@@ -20,8 +22,6 @@ public class SymbolMetricsDto
     public decimal DebtToEquity { get; set; }
     public decimal PegRatio { get; set; }
     public decimal ReturnOnEquity { get; set; }
-
-    public decimal? DividendYield { get; set; }
 
     public decimal EsgTotal { get; set; }
     public decimal EsgEnvironment { get; set; }

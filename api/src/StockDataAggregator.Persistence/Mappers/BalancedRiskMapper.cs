@@ -18,6 +18,7 @@ public static class BalancedRiskMapper
             Symbol = e.Symbol,
             Date = e.Date,
             UpdateDate = e.UpdateDate,
+            Currency = e.Currency,
             OneYearSalesGrowth = e.OneYearSalesGrowth,
             FourYearSalesGrowth = e.FourYearSalesGrowth,
             FourYearEarningsGrowth = e.FourYearEarningsGrowth,
