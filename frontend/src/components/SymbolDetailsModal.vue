@@ -123,22 +123,22 @@ const allYears = computed<number[]>(() => {
 
               <tr>
                 <th>ESG Total</th>
-                <td>{{ data.esgTotal }}</td>
+                <td>{{ data.esgTotal }} / 30</td>
               </tr>
               <tr>
                 <th>ESG Environment</th>
-                <td>{{ data.esgEnvironment }}</td>
+                <td>{{ data.esgEnvironment }} / 10</td>
               </tr>
               <tr>
                 <th>ESG Social</th>
-                <td>{{ data.esgSocial }}</td>
+                <td>{{ data.esgSocial }} / 10</td>
               </tr>
               <tr>
                 <th>ESG Governance</th>
-                <td>{{ data.esgGovernance }}</td>
+                <td>{{ data.esgGovernance }} / 10</td>
               </tr>
               <tr>
-                <th>ESG Publication</th>
+                <th>ESG Publication Date</th>
                 <td>{{ data.esgPublicationDate ? fmtLocalDateYYYYMMDD(data.esgPublicationDate) : '—' }}</td>
               </tr>
             </tbody>
