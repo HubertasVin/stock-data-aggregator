@@ -15,12 +15,19 @@ function fmtNumber(n: number | null | undefined) {
   if (n === null || n === undefined || Number.isNaN(n)) return '—'
   return new Intl.NumberFormat().format(n)
 }
-
 function fmtPercent(n: number | null | undefined, digits = 1) {
   if (n === null || n === undefined || Number.isNaN(n)) return '—'
   return `${(n * 100).toFixed(digits)}%`
 }
-
+function fmtLocalDateYYYYMMDD(s: string | null | undefined) {
+  if (!s) return '—'
+  const d = new Date(s)
+  if (Number.isNaN(d.getTime())) return '—'
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
 function metricClass(value: number | null | undefined, bounds?: MetricBounds | null, _higherIsBetter = true) {
   if (value === null || value === undefined || !bounds) return ''
   const lowerOk = bounds.lower == null || value > Number(bounds.lower)
@@ -123,7 +130,7 @@ function sortBy(k: keyof Row) {
             <td>
               <button class="badge link-badge" @click="emit('open-details', r.symbol)">{{ r.symbol }}</button>
             </td>
-            <td>{{ r.date ? new Date(r.date).toISOString().slice(0, 10) : '—' }}</td>
+            <td>{{ fmtLocalDateYYYYMMDD(r.date) }}</td>
 
             <td :class="metricClass(r.oneYearSalesGrowth, r.oneYearSalesGrowthBounds, true)">
               {{ fmtPercent(r.oneYearSalesGrowth) }}

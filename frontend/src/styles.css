@@ -412,14 +412,8 @@ footer {
   font-weight: 600;
   margin: 0;
 }
-.modal-actions {
-  margin-top: 12px;
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
 .modal--details {
-  width: min(92vw, 900px);
+  width: min(96vw, 1000px);
 }
 .modal-header {
   display: flex;
