@@ -113,6 +113,5 @@ export function formatAmount(n: number, code?: string): string {
   if (!code) return num;
   const up = code.toUpperCase();
   const sym = currencySymbols[up] ?? up;
-  const needsSpace = /^[A-Za-z]{2,}$/.test(sym);
-  return `${sym}${needsSpace ? " " : ""}${num}`;
+  return `${num} ${sym}`;
 }
