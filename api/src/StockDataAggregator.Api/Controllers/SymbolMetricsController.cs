@@ -12,10 +12,6 @@ public sealed class SymbolMetricsController : ControllerBase
 
     public SymbolMetricsController(ISymbolMetricsRepository repo) => _repo = repo;
 
-    [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<SymbolMetricsDto>>> GetAll() =>
-        Ok(await _repo.GetAllLatestPerSymbolAsync());
-
     [HttpGet("{symbol}")]
     public async Task<ActionResult<SymbolMetricsDto>> Get(string symbol)
     {

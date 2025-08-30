@@ -23,6 +23,8 @@ public class SymbolMetricsDto
     public decimal PegRatio { get; set; }
     public decimal ReturnOnEquity { get; set; }
 
+    public decimal? DividendYield { get; set; }
+
     public decimal EsgTotal { get; set; }
     public decimal EsgEnvironment { get; set; }
     public decimal EsgSocial { get; set; }

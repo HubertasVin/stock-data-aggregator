@@ -68,14 +68,11 @@ public class YahooDataClient : IMarketDataClient
         static decimal? TryGetRawDecimal(JsonElement node)
         {
             if (node.ValueKind == JsonValueKind.Object && node.TryGetProperty("raw", out var raw))
-            {
                 return raw.ValueKind == JsonValueKind.Number && raw.TryGetDecimal(out var d)
                     ? d
                     : null;
-            }
             if (node.ValueKind == JsonValueKind.Number && node.TryGetDecimal(out var bare))
                 return bare;
-
             return null;
         }
 
@@ -213,11 +210,10 @@ public class YahooDataClient : IMarketDataClient
             {
                 var a = win[i - 1];
                 var b = win[i];
-                decimal ratio;
-                if (!(a.Value.HasValue && b.Value.HasValue && a.Value > 0m && b.Value > 0m))
-                    ratio = 1m;
-                else
-                    ratio = b.Value.Value / a.Value.Value;
+                decimal ratio =
+                    (a.Value.HasValue && b.Value.HasValue && a.Value > 0m && b.Value > 0m)
+                        ? b.Value.Value / a.Value.Value
+                        : 1m;
                 prod *= ratio;
             }
             return prod - 1m;
@@ -230,7 +226,6 @@ public class YahooDataClient : IMarketDataClient
         decimal? forwardPE =
             TryGetDecimal(result, "summaryDetail", "forwardPE")
             ?? TryGetDecimal(result, "defaultKeyStatistics", "forwardPE");
-
         decimal? trailingPE =
             TryGetDecimal(result, "summaryDetail", "trailingPE")
             ?? TryGetDecimal(result, "defaultKeyStatistics", "trailingPE");
@@ -262,7 +257,6 @@ public class YahooDataClient : IMarketDataClient
         }
         if (!growthFrac.HasValue)
             growthFrac = TryGetDecimal(result, "financialData", "earningsGrowth");
-
         if (!growthFrac.HasValue)
         {
             var fwdEps = TryGetDecimal(result, "financialData", "forwardEps");
@@ -272,14 +266,18 @@ public class YahooDataClient : IMarketDataClient
         }
 
         decimal? chosenPE = forwardPE ?? trailingPE;
-        decimal? peg = null;
-        if (chosenPE.HasValue && growthFrac.HasValue && Math.Abs(growthFrac.Value) >= 0.001m)
-            peg = chosenPE.Value / (growthFrac.Value * 100m);
+        decimal? peg =
+            (chosenPE.HasValue && growthFrac.HasValue && Math.Abs(growthFrac.Value) >= 0.001m)
+                ? chosenPE.Value / (growthFrac.Value * 100m)
+                : null;
 
         var roe = TryGetDecimal(result, "financialData", "returnOnEquity") ?? 0m;
         var de = TryGetDecimal(result, "financialData", "debtToEquity") / 100 ?? 0m;
-
         var fcf = ExtractFreeCashFlow(result);
+
+        decimal? dividendYield =
+            TryGetDecimal(result, "summaryDetail", "dividendYield")
+            ?? TryGetDecimal(result, "summaryDetail", "trailingAnnualDividendYield");
 
         decimal esgTotal = 0m,
             esgEnv = 0m,
@@ -327,6 +325,8 @@ public class YahooDataClient : IMarketDataClient
             DebtToEquity = de,
             PegRatio = peg ?? 0m,
             ReturnOnEquity = roe,
+
+            DividendYield = dividendYield,
 
             EsgTotal = esgTotal,
             EsgEnvironment = esgEnv,
