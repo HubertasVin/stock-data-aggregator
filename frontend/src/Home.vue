@@ -159,8 +159,6 @@ const metricsMetaList = computed(() => Object.values(metricsMeta))
             <div v-if="loading" class="status">Loading…</div>
             <div v-else-if="error" class="status error">{{ error }}</div>
             <div v-else>
-                <div v-if="rows.length < 5" class="status">Scores are relative. Add more symbols for meaningful results.
-                </div>
                 <StocksTable :rows="rows" @open-details="openDetails" />
             </div>
         </div>

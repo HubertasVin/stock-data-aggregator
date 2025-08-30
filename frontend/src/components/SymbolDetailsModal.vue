@@ -1,4 +1,3 @@
-<!-- File: components/SymbolDetailsModal.vue -->
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted, computed } from 'vue'
 import { fetchSymbolMetrics } from '../api'
@@ -21,11 +20,14 @@ function fmtPercent(n: number | null | undefined, digits = 2) {
     if (n === null || n === undefined || Number.isNaN(n)) return '—'
     return `${(n * 100).toFixed(digits)}%`
 }
-function fmtDate(s: string | null | undefined) {
+function fmtDateOnly(s: string | null | undefined) {
     if (!s) return '—'
     const d = new Date(s)
     if (Number.isNaN(d.getTime())) return '—'
-    return d.toISOString().replace('T', ' ').replace('Z', ' UTC')
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${y}-${m}-${day}`
 }
 
 async function load() {
@@ -62,29 +64,25 @@ const allYears = computed<number[]>(() => {
 
 <template>
     <div v-if="open" class="modal-backdrop" @click.self="close">
-        <div class="modal" role="dialog" aria-modal="true" style="width:min(92vw,720px)">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="modal modal--details" role="dialog" aria-modal="true">
+            <div class="modal-header">
                 <div class="modal-title">Details — {{ symbol }}</div>
                 <button class="toggle" aria-label="Close" @click="close">✕</button>
             </div>
 
             <div v-if="loading" class="status">Loading…</div>
-            <div v-else-if="error" class="status error" style="text-align:left">{{ error }}</div>
-            <div v-else-if="data" class="section-body" style="padding:0">
-                <div class="table-wrap mini" style="max-height:60vh;overflow:auto">
+            <div v-else-if="error" class="status error">{{ error }}</div>
+            <div v-else-if="data">
+                <div class="table-wrap mini modal-table-wrap">
                     <table class="bounds-table compact">
                         <tbody>
                             <tr>
-                                <th>Symbol</th>
-                                <td>{{ data.symbol }}</td>
-                            </tr>
-                            <tr>
                                 <th>Date</th>
-                                <td>{{ fmtDate(data.date) }}</td>
+                                <td>{{ fmtDateOnly(data.date) }}</td>
                             </tr>
                             <tr>
                                 <th>Updated</th>
-                                <td>{{ fmtDate(data.updateDate) }}</td>
+                                <td>{{ fmtDateOnly(data.updateDate) }}</td>
                             </tr>
 
                             <tr>
@@ -140,13 +138,15 @@ const allYears = computed<number[]>(() => {
                             </tr>
                             <tr>
                                 <th>ESG Publication</th>
-                                <td>{{ data.esgPublicationDate ? fmtDate(data.esgPublicationDate) : '—' }}</td>
+                                <td>{{ data.esgPublicationDate ? fmtDateOnly(data.esgPublicationDate) : '—' }}</td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
 
-                    <div v-if="allYears.length" style="padding:10px 12px">
-                        <div class="subtle" style="margin:6px 0 8px">Yearly Financials</div>
+                <div v-if="allYears.length" class="modal-table-wrap">
+                    <div class="subtle">Yearly Financials</div>
+                    <div class="table-wrap mini">
                         <table class="bounds-table compact">
                             <thead>
                                 <tr>
@@ -166,9 +166,6 @@ const allYears = computed<number[]>(() => {
                     </div>
                 </div>
 
-                <div style="margin-top:12px;display:flex;justify-content:flex-end;gap:8px">
-                    <button class="btn" @click="close">Close</button>
-                </div>
             </div>
         </div>
     </div>

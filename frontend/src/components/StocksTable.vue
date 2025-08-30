@@ -1,4 +1,3 @@
-<!-- File: components/StocksTable.vue -->
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import type { BalancedRiskMetrics, MetricBounds } from '../types'
@@ -11,11 +10,6 @@ const emit = defineEmits<{ (e: 'open-details', symbol: string): void }>()
 const query = ref('')
 const sortKey = ref<keyof Row>('symbol')
 const sortDir = ref<'asc' | 'desc'>('asc')
-
-function safeVal(v: unknown, fallback: string = '—') {
-  if (v === null || v === undefined) return fallback
-  return String(v)
-}
 
 function fmtNumber(n: number | null | undefined) {
   if (n === null || n === undefined || Number.isNaN(n)) return '—'
@@ -127,10 +121,7 @@ function sortBy(k: keyof Row) {
         <tbody>
           <tr v-for="r in filtered" :key="r.symbol">
             <td>
-              <button class="badge" style="cursor:pointer;border-color:#2563eb;background:rgba(59,130,246,.08)"
-                @click="emit('open-details', r.symbol)">
-                {{ r.symbol }}
-              </button>
+              <button class="badge link-badge" @click="emit('open-details', r.symbol)">{{ r.symbol }}</button>
             </td>
             <td>{{ r.date ? new Date(r.date).toISOString().slice(0, 10) : '—' }}</td>
 
@@ -166,78 +157,3 @@ function sortBy(k: keyof Row) {
     </div>
   </div>
 </template>
-
-<style scoped>
-.q {
-  margin-left: 6px;
-  border: 1px solid var(--border, #e5e7eb);
-  border-radius: 999px;
-  width: 16px;
-  height: 16px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  line-height: 1;
-  cursor: help;
-  opacity: .7;
-}
-
-.metric-ok {
-  color: #059669;
-  font-weight: 600;
-}
-
-.metric-bad {
-  color: #dc2626;
-  font-weight: 600;
-}
-
-.score-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
-  border: 2px solid #e5e7eb;
-  background: #f9fafb;
-  color: #111827;
-  font-weight: 700;
-}
-
-.score-pill[data-score="9"],
-.score-pill[data-score="10"] {
-  border-color: #16a34a;
-  background: #ecfdf5;
-  color: #065f46;
-}
-
-.score-pill[data-score="7"],
-.score-pill[data-score="8"] {
-  border-color: #84cc16;
-  background: #f7fee7;
-  color: #3f6212;
-}
-
-.score-pill[data-score="5"],
-.score-pill[data-score="6"] {
-  border-color: #f59e0b;
-  background: #fffbeb;
-  color: #7c2d12;
-}
-
-.score-pill[data-score="3"],
-.score-pill[data-score="4"] {
-  border-color: #f97316;
-  background: #fff7ed;
-  color: #7c2d12;
-}
-
-.score-pill[data-score="1"],
-.score-pill[data-score="2"] {
-  border-color: #dc2626;
-  background: #fef2f2;
-  color: #7f1d1d;
-}
-</style>
