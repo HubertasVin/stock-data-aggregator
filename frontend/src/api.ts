@@ -1,5 +1,4 @@
-import type { BalancedRiskMetrics } from "./types";
-import type { SymbolMetrics } from "./types";
+import type { BalancedRiskMetrics, SymbolMetrics } from "./types";
 
 const BASE =
   (import.meta.env.VITE_API_BASE as string | undefined)?.replace(/\/$/, "") ||
@@ -50,9 +49,7 @@ export async function refreshSymbol(symbol: string): Promise<void> {
   if (!s) throw new Error("Empty symbol");
   const r = await fetch(
     `${BASE}/refresh/${encodeURIComponent(s)}`,
-    withAuth({
-      method: "POST",
-    })
+    withAuth({ method: "POST" })
   );
   if (!r.ok) throw new Error(`refresh(${s}): ${r.status}`);
 }

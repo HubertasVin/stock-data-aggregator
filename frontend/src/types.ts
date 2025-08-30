@@ -3,12 +3,6 @@ export interface MetricBounds {
   upper: number | null;
 }
 
-export interface YearDatum {
-  year: number;
-  revenue?: number | null;
-  earnings?: number | null;
-}
-
 export interface YearValue {
   year: number;
   value: number | null;
@@ -18,6 +12,7 @@ export interface BalancedRiskMetrics {
   symbol: string;
   date: string;
   updateDate: string;
+  currency: string;
 
   oneYearSalesGrowth: number | null;
   fourYearSalesGrowth: number | null;
@@ -36,8 +31,6 @@ export interface BalancedRiskMetrics {
   pegRatioBounds?: MetricBounds | null;
   returnOnEquityBounds?: MetricBounds | null;
 
-  financialsYearly?: YearDatum[];
-
   score: number;
 }
 
@@ -45,6 +38,7 @@ export interface SymbolMetrics {
   symbol: string;
   date: string;
   updateDate: string;
+  currency: string;
 
   oneYearSalesGrowth: number | null;
   fourYearSalesGrowth: number | null;
@@ -54,8 +48,7 @@ export interface SymbolMetrics {
   debtToEquity: number | null;
   pegRatio: number | null;
   returnOnEquity: number | null;
-
-  dividendYield: number | null;
+  dividendYield?: number | null;
 
   esgTotal: number;
   esgEnvironment: number;

@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import type { BalancedRiskMetrics, MetricBounds } from '../types'
 import { metricsMeta } from '../metrics'
+import { formatAmount } from '../currency'
 
 type Row = BalancedRiskMetrics
 const props = defineProps<{ rows: Row[] }>()
@@ -11,10 +12,6 @@ const query = ref('')
 const sortKey = ref<keyof Row>('symbol')
 const sortDir = ref<'asc' | 'desc'>('asc')
 
-function fmtNumber(n: number | null | undefined) {
-  if (n === null || n === undefined || Number.isNaN(n)) return '—'
-  return new Intl.NumberFormat().format(n)
-}
 function fmtPercent(n: number | null | undefined, digits = 1) {
   if (n === null || n === undefined || Number.isNaN(n)) return '—'
   return `${(n * 100).toFixed(digits)}%`
@@ -28,22 +25,21 @@ function fmtLocalDateYYYYMMDD(s: string | null | undefined) {
   const day = String(d.getDate()).padStart(2, '0')
   return `${y}-${m}-${day}`
 }
-function metricClass(value: number | null | undefined, bounds?: MetricBounds | null, _higherIsBetter = true) {
+function fmtMoney(n: number | null | undefined, code?: string) {
+  if (n === null || n === undefined || Number.isNaN(n)) return '—'
+  return formatAmount(n, code)
+}
+function metricClass(value: number | null | undefined, bounds?: MetricBounds | null) {
   if (value === null || value === undefined || !bounds) return ''
   const lowerOk = bounds.lower == null || value > Number(bounds.lower)
   const upperOk = bounds.upper == null || value < Number(bounds.upper)
-  const ok = lowerOk && upperOk
-  return ok ? 'metric-ok' : 'metric-bad'
+  return (lowerOk && upperOk) ? 'metric-ok' : 'metric-bad'
 }
 
 const filtered = computed(() => {
   const q = query.value.trim().toLowerCase()
   let data = props.rows
-  if (q) {
-    data = data.filter(r =>
-      r.symbol.toLowerCase().includes(q) || (r.date ?? '').toString().includes(q)
-    )
-  }
+  if (q) data = data.filter(r => r.symbol.toLowerCase().includes(q) || (r.date ?? '').toString().includes(q))
   const dir = sortDir.value === 'asc' ? 1 : -1
   return [...data].sort((a, b) => {
     const ka = (a as any)[sortKey.value]
@@ -132,26 +128,26 @@ function sortBy(k: keyof Row) {
             </td>
             <td>{{ fmtLocalDateYYYYMMDD(r.date) }}</td>
 
-            <td :class="metricClass(r.oneYearSalesGrowth, r.oneYearSalesGrowthBounds, true)">
+            <td :class="metricClass(r.oneYearSalesGrowth, r.oneYearSalesGrowthBounds)">
               {{ fmtPercent(r.oneYearSalesGrowth) }}
             </td>
-            <td :class="metricClass(r.fourYearSalesGrowth, r.fourYearSalesGrowthBounds, true)">
+            <td :class="metricClass(r.fourYearSalesGrowth, r.fourYearSalesGrowthBounds)">
               {{ fmtPercent(r.fourYearSalesGrowth) }}
             </td>
-            <td :class="metricClass(r.fourYearEarningsGrowth, r.fourYearEarningsGrowthBounds, true)">
+            <td :class="metricClass(r.fourYearEarningsGrowth, r.fourYearEarningsGrowthBounds)">
               {{ fmtPercent(r.fourYearEarningsGrowth) }}
             </td>
 
-            <td :class="metricClass(r.freeCashFlow, r.freeCashFlowBounds, true)">
-              {{ fmtNumber(r.freeCashFlow) }}
+            <td :class="metricClass(r.freeCashFlow, r.freeCashFlowBounds)">
+              {{ fmtMoney(r.freeCashFlow, r.currency) }}
             </td>
-            <td :class="metricClass(r.debtToEquity, r.debtToEquityBounds, false)">
+            <td :class="metricClass(r.debtToEquity, r.debtToEquityBounds)">
               {{ r.debtToEquity ?? '—' }}
             </td>
-            <td :class="metricClass(r.pegRatio, r.pegRatioBounds, false)">
+            <td :class="metricClass(r.pegRatio, r.pegRatioBounds)">
               {{ r.pegRatio?.toPrecision(3) ?? '—' }}
             </td>
-            <td :class="metricClass(r.returnOnEquity, r.returnOnEquityBounds, true)">
+            <td :class="metricClass(r.returnOnEquity, r.returnOnEquityBounds)">
               {{ fmtPercent(r.returnOnEquity) }}
             </td>
 
