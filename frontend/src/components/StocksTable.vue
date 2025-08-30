@@ -1,3 +1,4 @@
+<!-- File: components/StocksTable.vue -->
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import type { BalancedRiskMetrics, MetricBounds } from '../types'
@@ -5,6 +6,7 @@ import { metricsMeta } from '../metrics'
 
 type Row = BalancedRiskMetrics
 const props = defineProps<{ rows: Row[] }>()
+const emit = defineEmits<{ (e: 'open-details', symbol: string): void }>()
 
 const query = ref('')
 const sortKey = ref<keyof Row>('symbol')
@@ -25,7 +27,7 @@ function fmtPercent(n: number | null | undefined, digits = 1) {
   return `${(n * 100).toFixed(digits)}%`
 }
 
-function metricClass(value: number | null | undefined, bounds?: MetricBounds | null, higherIsBetter = true) {
+function metricClass(value: number | null | undefined, bounds?: MetricBounds | null, _higherIsBetter = true) {
   if (value === null || value === undefined || !bounds) return ''
   const lowerOk = bounds.lower == null || value > Number(bounds.lower)
   const upperOk = bounds.upper == null || value < Number(bounds.upper)
@@ -77,7 +79,6 @@ function sortBy(k: keyof Row) {
               Date <span class="dir">{{ sortKey === 'date' ? (sortDir === 'asc' ? '▲' : '▼') : '' }}</span>
             </th>
 
-            <!-- Growth -->
             <th class="sortable" @click="sortBy('oneYearSalesGrowth')">
               {{ metricsMeta.oneYearSalesGrowth.short }}
               <span class="q" :title="metricsMeta.oneYearSalesGrowth.full">?</span>
@@ -94,7 +95,6 @@ function sortBy(k: keyof Row) {
               <span class="dir">{{ sortKey === 'fourYearEarningsGrowth' ? (sortDir === 'asc' ? '▲' : '▼') : '' }}</span>
             </th>
 
-            <!-- Quality / Valuation -->
             <th class="sortable" @click="sortBy('freeCashFlow')">
               {{ metricsMeta.freeCashFlow.short }}
               <span class="q" :title="metricsMeta.freeCashFlow.full">?</span>
@@ -116,7 +116,6 @@ function sortBy(k: keyof Row) {
               <span class="dir">{{ sortKey === 'returnOnEquity' ? (sortDir === 'asc' ? '▲' : '▼') : '' }}</span>
             </th>
 
-            <!-- Score -->
             <th class="sortable" @click="sortBy('score')">
               {{ metricsMeta.score.short }}
               <span class="q" :title="metricsMeta.score.full">?</span>
@@ -127,7 +126,12 @@ function sortBy(k: keyof Row) {
 
         <tbody>
           <tr v-for="r in filtered" :key="r.symbol">
-            <td><span class="badge">{{ r.symbol }}</span></td>
+            <td>
+              <button class="badge" style="cursor:pointer;border-color:#2563eb;background:rgba(59,130,246,.08)"
+                @click="emit('open-details', r.symbol)">
+                {{ r.symbol }}
+              </button>
+            </td>
             <td>{{ r.date ? new Date(r.date).toISOString().slice(0, 10) : '—' }}</td>
 
             <td :class="metricClass(r.oneYearSalesGrowth, r.oneYearSalesGrowthBounds, true)">

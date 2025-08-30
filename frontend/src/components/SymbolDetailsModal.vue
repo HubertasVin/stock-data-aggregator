@@ -1,0 +1,175 @@
+<!-- File: components/SymbolDetailsModal.vue -->
+<script setup lang="ts">
+import { ref, watch, onMounted, onUnmounted, computed } from 'vue'
+import { fetchSymbolMetrics } from '../api'
+import type { SymbolMetrics } from '../types'
+
+const props = defineProps<{ open: boolean; symbol: string | null }>()
+const emit = defineEmits<{ (e: 'update:open', v: boolean): void }>()
+
+const loading = ref(false)
+const error = ref('')
+const data = ref<SymbolMetrics | null>(null)
+
+function close() { emit('update:open', false) }
+
+function fmtNumber(n: number | null | undefined) {
+    if (n === null || n === undefined || Number.isNaN(n)) return '—'
+    return new Intl.NumberFormat().format(n)
+}
+function fmtPercent(n: number | null | undefined, digits = 2) {
+    if (n === null || n === undefined || Number.isNaN(n)) return '—'
+    return `${(n * 100).toFixed(digits)}%`
+}
+function fmtDate(s: string | null | undefined) {
+    if (!s) return '—'
+    const d = new Date(s)
+    if (Number.isNaN(d.getTime())) return '—'
+    return d.toISOString().replace('T', ' ').replace('Z', ' UTC')
+}
+
+async function load() {
+    if (!props.open || !props.symbol) return
+    loading.value = true
+    error.value = ''
+    data.value = null
+    try {
+        data.value = await fetchSymbolMetrics(props.symbol)
+    } catch (e) {
+        error.value = String(e)
+    } finally {
+        loading.value = false
+    }
+}
+
+function onKey(e: KeyboardEvent) {
+    if (e.key === 'Escape') close()
+}
+
+watch(() => props.open, (v) => { if (v) load() })
+watch(() => props.symbol, () => { if (props.open) load() })
+
+onMounted(() => { window.addEventListener('keydown', onKey) })
+onUnmounted(() => { window.removeEventListener('keydown', onKey) })
+
+const allYears = computed<number[]>(() => {
+    const years = new Set<number>()
+    for (const d of (data.value?.revenueYearly ?? [])) years.add(d.year)
+    for (const d of (data.value?.earningsYearly ?? [])) years.add(d.year)
+    return Array.from(years).sort((a, b) => a - b)
+})
+</script>
+
+<template>
+    <div v-if="open" class="modal-backdrop" @click.self="close">
+        <div class="modal" role="dialog" aria-modal="true" style="width:min(92vw,720px)">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                <div class="modal-title">Details — {{ symbol }}</div>
+                <button class="toggle" aria-label="Close" @click="close">✕</button>
+            </div>
+
+            <div v-if="loading" class="status">Loading…</div>
+            <div v-else-if="error" class="status error" style="text-align:left">{{ error }}</div>
+            <div v-else-if="data" class="section-body" style="padding:0">
+                <div class="table-wrap mini" style="max-height:60vh;overflow:auto">
+                    <table class="bounds-table compact">
+                        <tbody>
+                            <tr>
+                                <th>Symbol</th>
+                                <td>{{ data.symbol }}</td>
+                            </tr>
+                            <tr>
+                                <th>Date</th>
+                                <td>{{ fmtDate(data.date) }}</td>
+                            </tr>
+                            <tr>
+                                <th>Updated</th>
+                                <td>{{ fmtDate(data.updateDate) }}</td>
+                            </tr>
+
+                            <tr>
+                                <th>1Y Sales Growth</th>
+                                <td>{{ fmtPercent(data.oneYearSalesGrowth, 2) }}</td>
+                            </tr>
+                            <tr>
+                                <th>4Y Sales Growth</th>
+                                <td>{{ fmtPercent(data.fourYearSalesGrowth, 2) }}</td>
+                            </tr>
+                            <tr>
+                                <th>4Y Earnings Growth</th>
+                                <td>{{ fmtPercent(data.fourYearEarningsGrowth, 2) }}</td>
+                            </tr>
+
+                            <tr>
+                                <th>Free Cash Flow</th>
+                                <td>{{ fmtNumber(data.freeCashFlow) }}</td>
+                            </tr>
+                            <tr>
+                                <th>Debt / Equity</th>
+                                <td>{{ data.debtToEquity ?? '—' }}</td>
+                            </tr>
+                            <tr>
+                                <th>PEG</th>
+                                <td>{{ data.pegRatio?.toPrecision ? data.pegRatio.toPrecision(4) : (data.pegRatio ??
+                                    '—') }}</td>
+                            </tr>
+                            <tr>
+                                <th>Return on Equity</th>
+                                <td>{{ fmtPercent(data.returnOnEquity, 2) }}</td>
+                            </tr>
+                            <tr v-if="data.dividendYield != null">
+                                <th>Dividend Yield</th>
+                                <td>{{ fmtPercent(data.dividendYield, 2) }}</td>
+                            </tr>
+
+                            <tr>
+                                <th>ESG Total</th>
+                                <td>{{ data.esgTotal }}</td>
+                            </tr>
+                            <tr>
+                                <th>ESG Environment</th>
+                                <td>{{ data.esgEnvironment }}</td>
+                            </tr>
+                            <tr>
+                                <th>ESG Social</th>
+                                <td>{{ data.esgSocial }}</td>
+                            </tr>
+                            <tr>
+                                <th>ESG Governance</th>
+                                <td>{{ data.esgGovernance }}</td>
+                            </tr>
+                            <tr>
+                                <th>ESG Publication</th>
+                                <td>{{ data.esgPublicationDate ? fmtDate(data.esgPublicationDate) : '—' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div v-if="allYears.length" style="padding:10px 12px">
+                        <div class="subtle" style="margin:6px 0 8px">Yearly Financials</div>
+                        <table class="bounds-table compact">
+                            <thead>
+                                <tr>
+                                    <th>Year</th>
+                                    <th>Revenue</th>
+                                    <th>Earnings</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="y in allYears" :key="y">
+                                    <td>{{ y }}</td>
+                                    <td>{{fmtNumber(data.revenueYearly?.find(d => d.year === y)?.value ?? null)}}</td>
+                                    <td>{{fmtNumber(data.earningsYearly?.find(d => d.year === y)?.value ?? null)}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div style="margin-top:12px;display:flex;justify-content:flex-end;gap:8px">
+                    <button class="btn" @click="close">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

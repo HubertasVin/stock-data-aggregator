@@ -9,6 +9,11 @@ export interface YearDatum {
   earnings?: number | null;
 }
 
+export interface YearValue {
+  year: number;
+  value: number | null;
+}
+
 export interface BalancedRiskMetrics {
   symbol: string;
   date: string;
@@ -34,4 +39,30 @@ export interface BalancedRiskMetrics {
   financialsYearly?: YearDatum[];
 
   score: number;
+}
+
+export interface SymbolMetrics {
+  symbol: string;
+  date: string;
+  updateDate: string;
+
+  oneYearSalesGrowth: number | null;
+  fourYearSalesGrowth: number | null;
+  fourYearEarningsGrowth: number | null;
+
+  freeCashFlow: number | null;
+  debtToEquity: number | null;
+  pegRatio: number | null;
+  returnOnEquity: number | null;
+
+  dividendYield: number | null;
+
+  esgTotal: number;
+  esgEnvironment: number;
+  esgSocial: number;
+  esgGovernance: number;
+  esgPublicationDate: string | null;
+
+  revenueYearly: YearValue[];
+  earningsYearly: YearValue[];
 }

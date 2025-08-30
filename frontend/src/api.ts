@@ -1,4 +1,5 @@
 import type { BalancedRiskMetrics } from "./types";
+import type { SymbolMetrics } from "./types";
 
 const BASE =
   (import.meta.env.VITE_API_BASE as string | undefined)?.replace(/\/$/, "") ||
@@ -68,7 +69,7 @@ export async function addSymbol(symbol: string): Promise<void> {
     })
   );
   if (!r.ok) throw new Error(`addSymbol: ${r.status}`);
-  await refreshSymbol(s); // required post-add refresh
+  await refreshSymbol(s);
 }
 
 export interface OkResult {
@@ -108,4 +109,12 @@ export async function fetchAllMetrics(): Promise<MetricsResult[]> {
     }
   });
   return Promise.all(tasks);
+}
+
+export async function fetchSymbolMetrics(
+  symbol: string
+): Promise<SymbolMetrics> {
+  const r = await fetch(`${BASE}/metrics/${encodeURIComponent(symbol)}`);
+  if (!r.ok) throw new Error(`metrics(${symbol}): ${r.status}`);
+  return r.json();
 }

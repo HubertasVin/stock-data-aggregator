@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import StocksTable from './components/StocksTable.vue'
+import SymbolDetailsModal from './components/SymbolDetailsModal.vue'
 import { fetchAllMetrics, type OkResult, type ErrResult } from './api'
 import type { BalancedRiskMetrics, MetricBounds } from './types'
 import { metricsMeta, type MetricKey } from './metrics'
@@ -10,6 +11,9 @@ const error = ref('')
 const rows = ref<BalancedRiskMetrics[]>([])
 const showBalanced = ref(true)
 const showAbout = ref(false)
+
+const detailsOpen = ref(false)
+const detailsSymbol = ref<string | null>(null)
 
 function isOk(r: OkResult | ErrResult): r is OkResult { return r.ok === true }
 function isErr(r: OkResult | ErrResult): r is ErrResult { return r.ok === false }
@@ -31,6 +35,11 @@ async function refresh() {
 }
 
 function onSymbolAdded() { refresh() }
+
+function openDetails(symbol: string) {
+    detailsSymbol.value = symbol
+    detailsOpen.value = true
+}
 
 onMounted(() => {
     refresh()
@@ -152,8 +161,10 @@ const metricsMetaList = computed(() => Object.values(metricsMeta))
             <div v-else>
                 <div v-if="rows.length < 5" class="status">Scores are relative. Add more symbols for meaningful results.
                 </div>
-                <StocksTable :rows="rows" />
+                <StocksTable :rows="rows" @open-details="openDetails" />
             </div>
         </div>
     </section>
+
+    <SymbolDetailsModal :open="detailsOpen" :symbol="detailsSymbol" @update:open="v => detailsOpen = v" />
 </template>
