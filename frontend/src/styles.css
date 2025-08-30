@@ -388,19 +388,6 @@ footer {
   border-color: transparent;
 }
 
-/* Add Symbol modal spacing */
-.modal > .modal-title {
-  margin-bottom: 8px;
-}
-.modal > .input {
-  margin-top: 8px;
-}
-.modal-actions {
-  margin-top: 12px;
-  gap: 8px;
-}
-
-/* Modal */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -422,10 +409,19 @@ footer {
 }
 .modal-title {
   font-weight: 600;
-  margin: 0;
+  margin: 0 0 8px 0;
+}
+.modal .input {
+  margin-top: 8px;
+  margin-bottom: 12px;
+}
+.modal-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
 }
 
-/* Details popup: width wraps table and 4rem column gap */
 .modal--details {
   display: inline-block;
   width: auto;
@@ -446,11 +442,43 @@ footer {
 .modal--details .table-wrap.mini table {
   width: auto;
 }
+
 .details-table {
-  border-collapse: separate;
-  border-spacing: 4rem 0;
+  border-collapse: collapse;
 }
-.details-table th,
-.details-table td {
-  white-space: nowrap;
+.details-table.bounds-table.compact th {
+  padding: 6px 2rem 6px 8px;
+}
+.details-table.bounds-table.compact td {
+  padding: 6px 8px 6px 2rem;
+}
+
+.auth-wrap {
+  min-height: calc(100vh - 120px);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+.auth-card {
+  width: min(92vw, 420px);
+  padding: 20px 18px 18px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--panel);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+.auth-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.auth-sub {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+.auth-btn {
+  width: 100%;
+  margin-top: 4px;
 }
