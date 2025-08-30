@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("StockDataAggregator.Api.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4993ed23e4bfd69b6f920abb2cc11e61b8590bac")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e2de46486ff41f696efe7f447275259078855a48")]
 [assembly: System.Reflection.AssemblyProductAttribute("StockDataAggregator.Api.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("StockDataAggregator.Api.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
