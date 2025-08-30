@@ -58,6 +58,7 @@ builder.Services.AddAuthorization(o => o.AddPolicy("AdminOnly", p => p.RequireRo
 
 builder.Services.AddScoped<ISymbolMetricsRepository, EfSymbolMetricsRepository>();
 builder.Services.AddScoped<BalancedRiskScoringService>();
+builder.Services.AddScoped<TrackedSymbolsService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
