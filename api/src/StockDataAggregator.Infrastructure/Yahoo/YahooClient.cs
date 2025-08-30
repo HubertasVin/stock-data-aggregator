@@ -23,15 +23,14 @@ public class YahooDataClient : IMarketDataClient
 
     public async Task<SymbolMetricsDto?> FetchAsync(string symbol)
     {
-        // Pull quoteSummary with everything we need (incl. ESG)
         var modules = string.Join(
             ",",
-            "earnings", // includes financialsChart.yearly
+            "earnings",
             "earningsTrend",
             "summaryDetail",
             "defaultKeyStatistics",
-            "financialData", // <-- contains freeCashflow
-            "cashflowStatementHistory", // <-- fallback for FCF
+            "financialData",
+            "cashflowStatementHistory",
             "esgScores"
         );
 
@@ -55,7 +54,6 @@ public class YahooDataClient : IMarketDataClient
         using var doc = JsonDocument.Parse(text);
         var result = doc.RootElement.GetProperty("quoteSummary").GetProperty("result")[0];
 
-        // --- helpers ---
         static bool TryGet(JsonElement parent, string prop, out JsonElement value)
         {
             if (parent.ValueKind == JsonValueKind.Object && parent.TryGetProperty(prop, out var v))
@@ -93,10 +91,9 @@ public class YahooDataClient : IMarketDataClient
             return TryGetRawDecimal(cur);
         }
 
-        // --- Extract FCF with proper fallbacks ---
         static decimal ExtractFreeCashFlow(JsonElement resultRoot)
         {
-            // 1) financialData.freeCashflow.raw
+            // financialData.freeCashflow.raw
             if (
                 TryGet(resultRoot, "financialData", out var financialData)
                 && TryGet(financialData, "freeCashflow", out var freeCashflowNode)
@@ -107,7 +104,7 @@ public class YahooDataClient : IMarketDataClient
                     return d1;
             }
 
-            // 2) cashflowStatementHistory.cashflowStatements[0].freeCashFlow.raw
+            // cashflowStatementHistory.cashflowStatements[0].freeCashFlow.raw
             if (
                 TryGet(resultRoot, "cashflowStatementHistory", out var cfh)
                 && TryGet(cfh, "cashflowStatements", out var statements)
@@ -124,7 +121,7 @@ public class YahooDataClient : IMarketDataClient
                         return d2;
                 }
 
-                // 3) Fallback compute: operatingCashflow - capitalExpenditures
+                // Fallback compute: operatingCashflow - capitalExpenditures
                 decimal op = 0,
                     capex = 0;
                 bool haveOp = false,
@@ -154,11 +151,9 @@ public class YahooDataClient : IMarketDataClient
                     return op - capex;
             }
 
-            // As a last resort:
             return 0m;
         }
 
-        // --- yearly revenue/earnings series from earnings.financialsChart.yearly ---
         var revSeries = new List<YearValue>();
         var earnSeries = new List<YearValue>();
         if (
@@ -180,7 +175,6 @@ public class YahooDataClient : IMarketDataClient
         revSeries.Sort((a, b) => a.Year.CompareTo(b.Year));
         earnSeries.Sort((a, b) => a.Year.CompareTo(b.Year));
 
-        // --- growth calcs (1Y yoy + 4Y chained) ---
         static decimal OneYearSales(List<YearValue> s)
         {
             if (s.Count < 2)
@@ -204,7 +198,7 @@ public class YahooDataClient : IMarketDataClient
                 var b = win[i];
                 decimal ratio;
                 if (!(a.Value.HasValue && b.Value.HasValue && a.Value > 0m && b.Value > 0m))
-                    ratio = 1m; // treat missing/invalid as neutral
+                    ratio = 1m;
                 else
                     ratio = b.Value.Value / a.Value.Value;
                 prod *= ratio;
@@ -216,7 +210,6 @@ public class YahooDataClient : IMarketDataClient
         var fourYearSales = FourYearChain(revSeries);
         var fourYearEarnings = FourYearChain(earnSeries);
 
-        // --- PEG (forward/trailing PE divided by % growth) ---
         decimal? forwardPE =
             TryGetDecimal(result, "summaryDetail", "forwardPE")
             ?? TryGetDecimal(result, "defaultKeyStatistics", "forwardPE");
